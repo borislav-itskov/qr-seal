@@ -23,8 +23,6 @@ export const getEOAPublicKey = () => {
   const privateKeyHex = getEOAPrivateKey();
   if (!privateKeyHex) throw new Error("No EOA private key found");
 
-  console.log(privateKeyHex);
-
   // Convert hex string back to bytes
   const privateKeyBytes = utils.arrayify(privateKeyHex);
 
