@@ -1,5 +1,5 @@
 {
-  "name": "light-schnorr-multisig",
+  "name": "qr-seal",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
