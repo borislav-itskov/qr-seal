@@ -6,8 +6,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import QRCodeScanner from "../../common/QRCodeScanner";
+import { useState } from "react";
 
 const CreateMultisigByScanning = (props: any) => {
+  const [multisigPublicAddress, setMultisigPublicAddress] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const handleScanSuccess = (scan: any = "") => {
     const data = scan.split("|");
@@ -33,6 +35,15 @@ const CreateMultisigByScanning = (props: any) => {
     onClose();
   };
   const handleScanError = (error: any) => console.error(error);
+
+  if (multisigPublicAddress) {
+    return (
+      <p style={{ fontSize: 16 }}>
+        Multisig account public address:{" "}
+        <small style={{ fontSize: 14 }}>{multisigPublicAddress}</small>
+      </p>
+    );
+  }
 
   return (
     <>
