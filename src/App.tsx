@@ -4,6 +4,7 @@ import "./App.css";
 import InstallPWA from "./install/InstallPWA";
 import Sign from "./sign/Sign";
 import EOAAccount from "./auth/components/EOAAccount";
+import JoinMultisig from "./multisig/components/JoinMultisig";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <EOAAccount />
         <img src={logo} className="App-logo" alt="logo" />
         <Sign />
+        <JoinMultisig />
       </header>
     </div>
   );
