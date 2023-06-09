@@ -26,15 +26,13 @@ const CreateTransaction = (props: any) => {
   const {
     handleSubmit,
     register,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<FormProps>();
 
   const onSubmit = (values: FormProps) => {
     return new Promise((resolve) => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
-        resolve(true);
-      }, 3000);
+      // TODO: Create transaction!
+      setTimeout(() => resolve(true), 1000);
     });
   };
 
