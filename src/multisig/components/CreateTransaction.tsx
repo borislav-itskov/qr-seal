@@ -1,6 +1,6 @@
 import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
-import { utils } from "ethers";
-import { useMemo } from "react";
+import { ethers, utils } from "ethers";
+import { useMemo, useState } from "react";
 import QRCode from "react-qr-code";
 import { getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
 import { useForm } from "react-hook-form";
@@ -15,6 +15,7 @@ import {
   Input,
   Button,
 } from "@chakra-ui/react";
+import { getAllMultisigData } from "../../auth/services/multisig";
 
 interface FormProps {
   to: string;
@@ -23,6 +24,8 @@ interface FormProps {
 
 const CreateTransaction = (props: any) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isQrOpen, onOpen: onQrOpen, onClose: onQrClose } = useDisclosure();
+  const [qrCodeValue, setQrCodeValue] = useState("");
   const {
     handleSubmit,
     register,
@@ -30,12 +33,34 @@ const CreateTransaction = (props: any) => {
   } = useForm<FormProps>();
 
   const onSubmit = (values: FormProps) => {
-    console.log("values", values);
+    const data = getAllMultisigData()
+    const abiCoder = new ethers.utils.AbiCoder()
+    const sendTosignerTxn = [values.to, ethers.utils.parseEther(values.value.toString()), '0x00']
+    const txns = [sendTosignerTxn]
+    // TO DO: the nonce is hardcoded to 0 here.
+    // change it to read from the contract if any
+    const msg = abiCoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [data.multisigAddr, 31337, 0, txns])
+    const publicKeyOne = new Key(Buffer.from(ethers.utils.arrayify(getEOAPublicKey())));
+    const publicKeyTwo = new Key(Buffer.from(ethers.utils.arrayify(data.multisigPartnerPublicKey)));
+    const publicKeys = [publicKeyOne, publicKeyTwo]
+    const schnorrkel = new Schnorrkel()
+    const privateKey =  new Key(Buffer.from(ethers.utils.arrayify(getEOAPrivateKey())))
+    const partnerNonces = {
+      kPublic: Key.fromHex(data.multisigPartnerKPublicHex),
+      kTwoPublic: Key.fromHex(data.multisigPartnerKTwoPublicHex)
+    }
+    const publicNonces = schnorrkel.generatePublicNonces(privateKey)
+    const combinedPublicNonces = [publicNonces, partnerNonces]
+    const hashFn = ethers.utils.keccak256
+    const {signature} = schnorrkel.multiSigSign(privateKey, msg, publicKeys, combinedPublicNonces, hashFn)
+    const sigHex = ethers.utils.hexlify(signature.buffer)
 
-    return new Promise((resolve) => {
-      // TODO: Create transaction!
-      setTimeout(() => resolve(true), 1000);
-    });
+    const kPublicHex = publicNonces.kPublic.toHex();
+    const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
+    const qrCode = getEOAPublicKey() + "|" + kPublicHex + "|" + kTwoPublicHex + "|" + sigHex + "|" + values.to + "|" + values.value.toString()
+    setQrCodeValue(qrCode)
+    onQrOpen()
+    return new Promise((resolve) => resolve(true))
   };
 
   return (
@@ -79,6 +104,13 @@ const CreateTransaction = (props: any) => {
               Submit
             </Button>
           </form>
+        </ModalContent>
+      </Modal>
+      {/* the qr code modal */}
+      <Modal isOpen={isQrOpen} onClose={onQrClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <QRCode value={qrCodeValue} style={{ padding: 20 }} />
         </ModalContent>
       </Modal>
     </>
