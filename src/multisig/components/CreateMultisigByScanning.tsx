@@ -9,8 +9,30 @@ import QRCodeScanner from "../../common/QRCodeScanner";
 
 const CreateMultisigByScanning = (props: any) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const handleScanSuccess = (scan: any) => console.log(scan);
-  const handleScanError = (error: any) => console.log(error);
+  const handleScanSuccess = (scan: any = "") => {
+    const data = scan.split("|");
+
+    // TODO: Validate better if data is multisig!
+    if (data.length !== 3) {
+      alert("Missing all multisig data in the QR code you scanned!");
+
+      return;
+    }
+
+    const multisigPartnerPublicKey = data[0];
+    const multisigPartnerKPublicHex = data[1];
+    const multisigPartnerKTwoPublicHex = data[2];
+
+    // TODO: Create multisig!
+    console.log(
+      "Scanned!",
+      multisigPartnerPublicKey,
+      multisigPartnerKPublicHex,
+      multisigPartnerKTwoPublicHex
+    );
+    onClose();
+  };
+  const handleScanError = (error: any) => console.error(error);
 
   return (
     <>
