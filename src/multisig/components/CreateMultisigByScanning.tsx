@@ -4,7 +4,11 @@ import {
   ModalContent,
   ModalOverlay,
   useDisclosure,
+  Box,
+  Text,
+  Flex,
 } from "@chakra-ui/react";
+import Blockies from "react-blockies";
 import QRCodeScanner from "../../common/QRCodeScanner";
 import { useState } from "react";
 import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
@@ -16,15 +20,20 @@ import {
 } from "../../deploy/getBytecode";
 import { ethers } from "ethers";
 import { getEOAPublicKey } from "../../auth/services/eoa";
-import { createAndStoreMultisigDataIfNeeded, getAllMultisigData } from "../../auth/services/multisig";
+import {
+  createAndStoreMultisigDataIfNeeded,
+  getAllMultisigData,
+} from "../../auth/services/multisig";
 
 // TODO: Change those when we deploy on a specific network
 const FACTORY_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const AMBIRE_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 
 const CreateMultisigByScanning = (props: any) => {
-  const multisigData = getAllMultisigData()
-  const [multisigPublicAddress, setMultisigPublicAddress] = useState((multisigData && multisigData.multisigAddr) || "");
+  const multisigData = getAllMultisigData();
+  const [multisigPublicAddress, setMultisigPublicAddress] = useState(
+    (multisigData && multisigData.multisigAddr) || ""
+  );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const handleScanSuccess = (scan: any = "") => {
     const data = scan.split("|");
@@ -72,12 +81,11 @@ const CreateMultisigByScanning = (props: any) => {
 
       // Set data in local storage
       createAndStoreMultisigDataIfNeeded({
-        "multisigPartnerPublicKey": multisigPartnerPublicKey,
-        "multisigPartnerKPublicHex": multisigPartnerKPublicHex,
-        "multisigPartnerKTwoPublicHex": multisigPartnerKTwoPublicHex,
-        "multisigAddr": multisigAddr
-      })
-
+        multisigPartnerPublicKey: multisigPartnerPublicKey,
+        multisigPartnerKPublicHex: multisigPartnerKPublicHex,
+        multisigPartnerKTwoPublicHex: multisigPartnerKTwoPublicHex,
+        multisigAddr: multisigAddr,
+      });
     } catch (e) {
       console.log("The multisig creation failed", e);
     }
@@ -86,10 +94,26 @@ const CreateMultisigByScanning = (props: any) => {
 
   if (multisigPublicAddress) {
     return (
-      <p style={{ fontSize: 16 }}>
-        Multisig account public address:{" "}
-        <small style={{ fontSize: 14 }}>{multisigPublicAddress}</small>
-      </p>
+      <Box maxW={"500px"} w={"full"} boxShadow={"2xl"} rounded={"lg"} p={6}>
+        <Flex>
+          <Box mr={4} rounded="lg">
+            <Blockies
+              seed={multisigPublicAddress}
+              size={15}
+              scale={4}
+              className="identicon"
+            />
+          </Box>
+          <Box>
+            <Text fontSize={"lg"} textAlign="left" fontWeight={500} mb={2}>
+              Multisig Account Address
+            </Text>
+            <Text fontSize={"md"} textAlign="left" fontWeight={400}>
+              {multisigPublicAddress}
+            </Text>
+          </Box>
+        </Flex>
+      </Box>
     );
   }
 
