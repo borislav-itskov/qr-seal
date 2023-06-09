@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@borislav.itskov/schnorrkel.js": "^2.0.4",
+    "@borislav.itskov/schnorrkel.js": "^2.0.5",
     "@chakra-ui/react": "^2.7.0",
     "@craco/craco": "^7.1.0",
     "@emotion/react": "^11.11.1",
@@ -18,8 +18,10 @@
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
+    "ethereumjs-abi": "^0.6.8",
     "ethers": "^5.7.2",
     "html5-qrcode": "^2.3.8",
+    "js-sha3": "^0.8.0",
     "framer-motion": "^10.12.16",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -64,5 +66,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@types/chai": "^4.3.5",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.2.5",
+    "chai": "^4.3.7",
+    "hardhat": "^2.15.0",
+    "ts-node": "^10.9.1"
   }
 }
