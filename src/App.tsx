@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { getAllMultisigData } from "./auth/services/multisig";
+import MultisigContext from "./auth/context/multisig";
 
 import InstallPWA from "./install/InstallPWA";
 import Sign from "./sign/Sign";
@@ -11,7 +11,7 @@ import JoinMultisig from "./multisig/components/JoinMultisig";
 import CreateTransaction from "./multisig/components/CreateTransaction";
 
 function App() {
-  const multisigData = getAllMultisigData()
+  const { multisigData } = useContext(MultisigContext);
 
   return (
     <div className="App">
