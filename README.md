@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# Light Schnorr Multisig, ETH Prague 2023 Hackathon
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
