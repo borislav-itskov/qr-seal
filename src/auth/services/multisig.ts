@@ -11,14 +11,16 @@ export const getMultisigData = () =>
   localStorage.getItem(STORAGE_KEY_MULTISIG) || "";
 
 export const createAndStoreMultisigDataIfNeeded = (multisigData: MultisigData) => {
-  const storedPrivateKey = getMultisigData();
-  if (storedPrivateKey) return;
+  const storedMultisigData = getMultisigData();
+  if (storedMultisigData) return;
 
   // Store the private key hex string in local storage
   localStorage.setItem(STORAGE_KEY_MULTISIG, JSON.stringify(multisigData));
 };
 
-export const getAllMultisicData = () => {
-  const privateKeyHex = getMultisigData();
-  if (!privateKeyHex) throw new Error("No Multisig data found");
+export const getAllMultisigData = () => {
+  const multisigData = getMultisigData();
+  if (!multisigData) return '';
+
+  return JSON.parse(multisigData)
 };
