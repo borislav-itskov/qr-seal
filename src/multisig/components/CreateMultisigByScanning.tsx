@@ -16,6 +16,7 @@ import {
 } from "../../deploy/getBytecode";
 import { ethers } from "ethers";
 import { getEOAPublicKey } from "../../auth/services/eoa";
+import { createAndStoreMultisigDataIfNeeded } from "../../auth/services/multisig";
 
 // TODO: Change those when we deploy on a specific network
 const FACTORY_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
@@ -67,6 +68,15 @@ const CreateMultisigByScanning = (props: any) => {
       );
       const multisigAddr = getAmbireAccountAddress(FACTORY_ADDRESS, bytecode);
       setMultisigPublicAddress(multisigAddr);
+
+      // Set data in local storage
+      createAndStoreMultisigDataIfNeeded({
+        "multisigPartnerPublicKey": multisigPartnerPublicKey,
+        "multisigPartnerKPublicHex": multisigPartnerKPublicHex,
+        "multisigPartnerKTwoPublicHex": multisigPartnerKTwoPublicHex,
+        "multisigAddr": multisigAddr
+      })
+
     } catch (e) {
       console.log("The multisig creation failed", e);
     }
