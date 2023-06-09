@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "QR Seal",
+  "name": "QR Seal",
+  "description": "QR-Seal is a secure, user-friendly multisig crypto wallet that leverages Schnorr signatures and QR technology for fast and efficient blockchain transactions.",
   "icons": [
     {
       "src": "favicon.ico",
