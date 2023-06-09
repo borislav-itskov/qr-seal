@@ -30,6 +30,8 @@ const CreateTransaction = (props: any) => {
   } = useForm<FormProps>();
 
   const onSubmit = (values: FormProps) => {
+    console.log("values", values);
+
     return new Promise((resolve) => {
       // TODO: Create transaction!
       setTimeout(() => resolve(true), 1000);
@@ -45,24 +47,26 @@ const CreateTransaction = (props: any) => {
           <h2>Create Transaction</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl>
-              <FormLabel htmlFor="to">To</FormLabel>
+              <FormLabel htmlFor="to">To:</FormLabel>
               <Input
                 id="to"
                 type="text"
-                placeholder="to (address)"
+                placeholder="0x..."
                 {...register("to", {
                   required: "This is required",
                 })}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="value">To</FormLabel>
+              <FormLabel htmlFor="value">Amount:</FormLabel>
               <Input
                 id="value"
-                placeholder="value"
+                placeholder="0.00"
                 type="number"
+                step="0.000000001"
                 {...register("value", {
                   required: "This is required",
+                  valueAsNumber: true,
                 })}
               />
             </FormControl>
