@@ -1,9 +1,6 @@
 import React from "react";
 import { utils } from "ethers";
-// TODO: Figure out why this import fails
-// import Schnorrkel from "@borislav.itskov/schnorrkel.js";
-const Schnorrkel = require("@borislav.itskov/schnorrkel.js");
-const schnorrkel = new Schnorrkel();
+import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
 
 // TODO: That's temporarily
 const privateKey = utils.randomBytes(32);
@@ -16,11 +13,19 @@ const publicKey = utils.arrayify(
 
 const Sign: React.FC = () => {
   const handleClick = () => {
-    const { R, s } = schnorrkel.sign(msg, privateKey);
+    const { signature, finalPublicNonce } = Schnorrkel.sign(
+      new Key(Buffer.from(privateKey)),
+      msg
+    );
 
     console.log("publicKey", publicKey);
 
-    const isVerified = schnorrkel.verify(s, msg, R, publicKey);
+    const isVerified = Schnorrkel.verify(
+      signature,
+      msg,
+      finalPublicNonce,
+      new Key(Buffer.from(publicKey))
+    );
     console.log("Verified or not:", isVerified);
   };
 
