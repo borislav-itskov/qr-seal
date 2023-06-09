@@ -6,6 +6,7 @@ import Sign from "./sign/Sign";
 import EOAAccount from "./auth/components/EOAAccount";
 import CreateMultisigByScanning from "./multisig/components/CreateMultisigByScanning";
 import JoinMultisig from "./multisig/components/JoinMultisig";
+import CreateTransaction from "./multisig/components/CreateTransaction";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Sign />
         <CreateMultisigByScanning />
         <JoinMultisig />
+        <CreateTransaction />
       </header>
     </div>
   );
