@@ -9,7 +9,10 @@ import QRCodeScanner from "../../common/QRCodeScanner";
 
 const CreateMultisigByScanning = (props: any) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const handleScanSuccess = (scan: any) => console.log(scan);
+  const handleScanSuccess = (scan: any) => {
+    console.log("Scanned!", scan);
+    onClose();
+  };
   const handleScanError = (error: any) => console.log(error);
 
   return (
