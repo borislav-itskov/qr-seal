@@ -1,6 +1,8 @@
 import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import { getAllMultisigData } from "./auth/services/multisig";
+
 import InstallPWA from "./install/InstallPWA";
 import Sign from "./sign/Sign";
 import EOAAccount from "./auth/components/EOAAccount";
@@ -9,6 +11,8 @@ import JoinMultisig from "./multisig/components/JoinMultisig";
 import CreateTransaction from "./multisig/components/CreateTransaction";
 
 function App() {
+  const multisigData = getAllMultisigData()
+
   return (
     <div className="App">
       <header className="App-header">
@@ -19,7 +23,7 @@ function App() {
         <Sign />
         <CreateMultisigByScanning />
         <JoinMultisig />
-        <CreateTransaction />
+        {multisigData && <CreateTransaction />}
       </header>
     </div>
   );
