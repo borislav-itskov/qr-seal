@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        {/* TODO: Beautify */}
+        {/* TODO: Figure out on a later step if we should leave this installation button */}
         <InstallPWA />
         <EOAAccount />
         <img src={logo} className="App-logo" alt="logo" />
