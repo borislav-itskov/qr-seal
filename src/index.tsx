@@ -15,11 +15,11 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <ChakraProvider>
-      <App />
-    </ChakraProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <ChakraProvider>
+    <App />
+  </ChakraProvider>
+  // </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change
