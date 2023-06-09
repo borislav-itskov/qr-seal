@@ -4,13 +4,21 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./config/service-worker-registration";
+import { createAndStoreEOAIfNeeded } from "./auth/services/eoa";
+import { ChakraProvider } from "@chakra-ui/react";
+
+// TODO: Init EOA account creation when page is loaded. Ideally, it should
+// prompt the user to create EOA or something.
+createAndStoreEOAIfNeeded();
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <ChakraProvider>
+      <App />
+    </ChakraProvider>
   </React.StrictMode>
 );
 
