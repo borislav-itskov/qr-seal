@@ -2,6 +2,7 @@
 pragma solidity 0.8.19;
 
 import './AmbireAccount.sol';
+import 'hardhat/console.sol';
 
 contract AmbireAccountFactory {
 	event LogDeployed(address addr, uint256 salt);
