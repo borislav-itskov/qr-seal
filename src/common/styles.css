@@ -1,0 +1,32 @@
+/** QR code scanner couldnt be scanner **/
+
+#html5qr-code-full-region__scan_region {
+    display: flex;
+    justify-content: center;
+    border-radius: 12px;
+}
+  
+button.html5-qrcode-element {
+    border-radius: var(--chakra-radii-md);
+    font-weight: var(--chakra-fontWeights-semibold);
+    transition-property: var(--chakra-transition-property-common);
+    transition-duration: var(--chakra-transition-duration-normal);
+    height: var(--chakra-sizes-10);
+    min-width: var(--chakra-sizes-10);
+    font-size: var(--chakra-fontSizes-md);
+    -webkit-padding-start: var(--chakra-space-4);
+    padding-inline-start: var(--chakra-space-4);
+    -webkit-padding-end: var(--chakra-space-4);
+    padding-inline-end: var(--chakra-space-4);
+    background: var(--chakra-colors-green-500);
+    color: var(--chakra-colors-white);
+}
+
+span.html5-qrcode-element {
+    display: none !important;
+}
+
+
+#html5qr-code-full-region__header_message {
+    font-weight: var(--chakra-fontWeights-semibold);
+}
