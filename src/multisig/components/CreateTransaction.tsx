@@ -44,7 +44,7 @@ const CreateTransaction = (props: any) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent style={{ padding: 20 }}>
-          <h2>Create Transaction</h2>
+          <h2 style={{ marginBottom: 20 }}>Create Transaction</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl>
               <FormLabel htmlFor="to">To:</FormLabel>
@@ -52,6 +52,7 @@ const CreateTransaction = (props: any) => {
                 id="to"
                 type="text"
                 placeholder="0x..."
+                mb={4}
                 {...register("to", {
                   required: "This is required",
                 })}
@@ -64,6 +65,7 @@ const CreateTransaction = (props: any) => {
                 placeholder="0.00"
                 type="number"
                 step="0.000000001"
+                mb={4}
                 {...register("value", {
                   required: "This is required",
                   valueAsNumber: true,
