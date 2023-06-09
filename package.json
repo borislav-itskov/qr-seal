@@ -4,7 +4,10 @@
   "private": true,
   "dependencies": {
     "@borislav.itskov/schnorrkel.js": "^2.0.4",
+    "@chakra-ui/react": "^2.7.0",
     "@craco/craco": "^7.1.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -16,6 +19,7 @@
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
     "ethers": "^5.7.2",
+    "framer-motion": "^10.12.16",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
