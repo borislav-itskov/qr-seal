@@ -30,6 +30,7 @@ const CreateMultisigByScanning = (props: any) => {
       multisigPartnerKPublicHex,
       multisigPartnerKTwoPublicHex
     );
+    onClose();
   };
   const handleScanError = (error: any) => console.error(error);
 
