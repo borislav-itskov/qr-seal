@@ -2,6 +2,7 @@ import React from "react";
 import { utils } from "ethers";
 import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
 import { getEOAPrivateKey, getEOAPublicKey } from "../auth/services/eoa";
+import { Button } from "@chakra-ui/react";
 
 // TODO: That's temporarily
 const msg = "My friend Bobby is awesome!";
@@ -27,7 +28,11 @@ const Sign: React.FC = () => {
     console.log("Verified or not:", isVerified);
   };
 
-  return <button onClick={handleClick}>Sign Message</button>;
+  return (
+    <Button onClick={handleClick} colorScheme="green">
+      Sign Message
+    </Button>
+  );
 };
 
 export default Sign;
