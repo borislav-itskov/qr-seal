@@ -4,18 +4,13 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./config/service-worker-registration";
-import { createAndStoreEOAIfNeeded } from "./auth/services/eoa";
 import { MultisigProvider } from "./auth/context/multisig";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { EOAProvider } from "./auth/context/eoa";
 
 // TODO: Optimize those by importing only the weights we need
 import '@fontsource-variable/roboto-slab';
 import '@fontsource-variable/open-sans';
-import { EOAProvider } from "./auth/context/eoa";
-
-// TODO: Init EOA account creation when page is loaded. Ideally, it should
-// prompt the user to create EOA or something.
-// createAndStoreEOAIfNeeded();
 
 const theme = extendTheme({
   fonts: {

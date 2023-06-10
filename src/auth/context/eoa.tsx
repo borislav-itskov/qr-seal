@@ -19,7 +19,7 @@ const EOAContext = createContext<EOAContextType>({
 
 export const useEOA = () => useContext(EOAContext);
 
-export const EOAProvider: React.FC = ({ children }) => {
+export const EOAProvider: React.FC<any> = ({ children }) => {
   const [eoaPrivateKey, setEOAPrivateKey] = useState<string>('');
   const [eoaPublicKey, setEOAPublicKey] = useState<string>('');
   const [eoaAddress, setEOAAddress] = useState<string>('');

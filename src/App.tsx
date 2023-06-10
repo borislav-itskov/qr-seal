@@ -1,9 +1,11 @@
 import React, { useContext, useEffect } from "react";
 import logo from "./qr-seal-logo-transparent.png";
 import "./App.css";
-import { Flex, Box, Heading } from "@chakra-ui/react"
 import MultisigContext from "./auth/context/multisig";
 import {
+  Flex,
+  Box,
+  Heading,
   Step,
   StepIndicator,
   StepSeparator,
@@ -15,11 +17,10 @@ import {
 
 import InstallPWA from "./install/InstallPWA";
 import Accounts from "./common/accounts";
-import CreateMultisigByScanning from "./multisig/components/CreateMultisigByScanning";
 import JoinMultisig from "./multisig/components/JoinMultisig";
 import CreateTransaction from "./multisig/components/CreateTransaction";
 import CoSign from "./multisig/components/CoSign";
-import { getEOAAddress } from "./auth/services/eoa";
+import { useEOA } from "./auth/context/eoa";
 
 const steps = [
   { title: "EOA" },
@@ -28,7 +29,7 @@ const steps = [
 ]
 
 function App() {
-  const address = getEOAAddress();
+  const { eoaAddress } = useEOA()
   const { multisigData } = useContext(MultisigContext);
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
@@ -36,14 +37,14 @@ function App() {
   })
 
   useEffect(() => {
-    if (address && !multisigData) {
+    if (eoaAddress && !multisigData) {
       setActiveStep(1)
     }
 
-    if (address && multisigData) {
+    if (eoaAddress && multisigData) {
       setActiveStep(2)
     }
-  }, [activeStep, setActiveStep, address, multisigData]);
+  }, [activeStep, setActiveStep, eoaAddress, multisigData]);
 
   return (
   <Flex color={"white"} justifyContent={"center"} minHeight={"100vh"} backgroundColor="blue.100">
@@ -77,8 +78,7 @@ function App() {
               <Accounts />
               <Flex flexDirection={"column"}>
                 <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
-                  <CreateMultisigByScanning />
-                  {address && <JoinMultisig />}
+                  {eoaAddress && <JoinMultisig />}
                 </Flex>
 
                 {activeStep === 2 && <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
