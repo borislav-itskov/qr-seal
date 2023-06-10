@@ -74,7 +74,7 @@ function App() {
             </Stepper>
             <Flex flexDirection={"column"} flex={1}>
               {/* TODO: Figure out on a later step if we should leave this installation button */}
-              <InstallPWA />
+              {/* <InstallPWA /> */}
               <Accounts />
               <Flex flexDirection={"column"}>
                 <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
