@@ -181,8 +181,9 @@ const CoSign = (props: any) => {
     )
     const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
     const feeData = await mainProvider.getFeeData()
+    console.log(feeData.gasPrice)
     const transactionHash = await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig, {
-      gasPrice: feeData.gasPrice,
+      gasPrice: feeData.gasPrice?.toString(),
       gasLimit: ethers.BigNumber.from(ethers.utils.hexlify(100000000))
     })
 

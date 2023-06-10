@@ -44,7 +44,8 @@ async function deploy() {
 
   const feeData = await provider.getFeeData()
   const sig = await generateAmbireDeploy(feeData.gasPrice)
-  console.log(sig)
+//   console.log(ethers.utils.parseUnits(feeData.gasPrice.toString(), 'gwei'))
+  console.log(feeData.gasPrice.toString())
 
   // const contractFactoryAmbire = new ethers.ContractFactory(AmbireAccount.abi, AmbireAccount.bytecode, fundWallet)
   // const ambireTxn = contractFactoryAmbire.getDeployTransaction({
