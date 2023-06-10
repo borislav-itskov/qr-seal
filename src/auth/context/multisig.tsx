@@ -6,7 +6,8 @@ export interface MultisigData {
   multisigPartnerPublicKey: string;
   multisigPartnerKPublicHex: string;
   multisigPartnerKTwoPublicHex: string;
-  multisigAddr: string
+  multisigAddr: string;
+  multisigPartnerSignature?: string;
 }
 
 export const getMultisigData = () =>

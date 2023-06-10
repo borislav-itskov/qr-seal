@@ -15,6 +15,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import MultisigContext from "../../auth/context/multisig";
+import getSchnorrkelInstance from "../../singletons/Schnorr";
 
 interface FormProps {
   to: string;
@@ -60,7 +61,7 @@ const CreateTransaction = (props: any) => {
       Buffer.from(ethers.utils.arrayify(data.multisigPartnerPublicKey))
     );
     const publicKeys = [publicKeyOne, publicKeyTwo];
-    const schnorrkel = new Schnorrkel();
+    const schnorrkel = getSchnorrkelInstance()
     const privateKey = new Key(
       Buffer.from(ethers.utils.arrayify(getEOAPrivateKey()))
     );
@@ -78,8 +79,7 @@ const CreateTransaction = (props: any) => {
       combinedPublicNonces,
       hashFn
     );
-    const sigHex = ethers.utils.hexlify(signature.buffer);
-
+    const sigHex = signature.toHex()
     const kPublicHex = publicNonces.kPublic.toHex();
     const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
     // const qrCode = getEOAPublicKey() + "|" + kPublicHex + "|" + kTwoPublicHex + "|" + sigHex + "|" + values.to + "|" + values.value.toString()
@@ -92,9 +92,17 @@ const CreateTransaction = (props: any) => {
       "|" +
       sigHex +
       "|" +
-      msg;
+      values.to +
+      "|" +
+      values.value
     setQrCodeValue(qrCode);
     onQrOpen();
+    console.log(getEOAPublicKey())
+    console.log(kPublicHex)
+    console.log(kTwoPublicHex)
+    console.log(sigHex)
+    console.log(values.to)
+    console.log(values.value)
     return new Promise((resolve) => resolve(true));
   };
 

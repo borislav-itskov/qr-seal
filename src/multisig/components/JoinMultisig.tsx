@@ -10,11 +10,12 @@ import { utils } from "ethers";
 import { useMemo } from "react";
 import QRCode from "react-qr-code";
 import { getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
+import getSchnorrkelInstance from "../../singletons/Schnorr";
 
 const JoinMultisig = (props: any) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const qrCodeValue = useMemo(() => {
-    const schnorrkel = new Schnorrkel();
+    const schnorrkel = getSchnorrkelInstance();
     const publicKey = getEOAPublicKey();
 
     const publicNonces = schnorrkel.generatePublicNonces(
