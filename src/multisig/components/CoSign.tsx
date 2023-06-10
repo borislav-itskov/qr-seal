@@ -7,6 +7,7 @@ import {
     FormLabel,
     Input,
     useDisclosure,
+    useToast,
   } from "@chakra-ui/react";
 import QRCodeScanner from "../../common/QRCodeScanner";
 import { useState, createContext, useContext } from "react";
@@ -32,6 +33,7 @@ interface FormProps {
 }
 
 const CoSign = (props: any) => {
+  const toast = useToast()
   const { eoaPrivateKey, eoaPublicKey } = useEOA()
   const { createAndStoreMultisigDataIfNeeded, getAllMultisigData } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -178,6 +180,14 @@ const CoSign = (props: any) => {
     const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
     // const deployment = await factory.deploy(data.bytecode, 0)
     await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig)
+
+    onFormClose()
+    toast({
+      title: 'Successfully signed!',
+      status: 'success',
+      duration: 9000,
+      isClosable: true,
+    })
 
     // TO DO: get transaction hash and display a link to a scanner
   }

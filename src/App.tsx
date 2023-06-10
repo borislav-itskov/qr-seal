@@ -81,10 +81,10 @@ function App() {
                   {eoaAddress && <JoinMultisig />}
                 </Flex>
 
-                {activeStep === 2 && <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
-                  <CreateTransaction />
+                <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
+                  {activeStep === 2 && <CreateTransaction />}
                   <CoSign />
-                </Flex>}
+                </Flex>
 
               </Flex>
           </Flex>
