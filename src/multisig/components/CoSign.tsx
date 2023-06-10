@@ -184,6 +184,7 @@ const CoSign = (props: any) => {
     onFormClose()
     toast({
       title: 'Successfully signed!',
+      potion: 'top',
       status: 'success',
       duration: 9000,
       isClosable: true,
