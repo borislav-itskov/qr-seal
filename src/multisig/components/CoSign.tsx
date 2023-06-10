@@ -175,10 +175,12 @@ const CoSign = (props: any) => {
       mainProvider
     )
     const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
-    // const deployment = await factory.deploy(data.bytecode, 0)
-    await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig)
-
-    // TO DO: get transaction hash and display a link to a scanner
+    const feeData = await mainProvider.getFeeData()
+    const transactionHash = await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig, {
+      gasPrice: feeData.gasPrice,
+      gasLimit: ethers.BigNumber.from(ethers.utils.hexlify(100000000))
+    })
+    // TO DO: show txn hash in polygon scan
   }
 
   return (

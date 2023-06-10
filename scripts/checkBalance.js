@@ -7,6 +7,8 @@ async function checkBalance() {
   const balance = await provider.getBalance('0xdd2a7Dc3d038b5EA4164D41B3617aDa5eb4179bf')
 
   console.log('balance', balance)
+
+  console.log(ethers.utils.parseUnits("140", "gwei").toString())
 }
 
 // We recommend this pattern to be able to use async/await everywhere
