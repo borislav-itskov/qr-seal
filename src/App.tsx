@@ -1,9 +1,11 @@
 import React, { useContext, useEffect } from "react";
 import logo from "./qr-seal-logo-transparent.png";
 import "./App.css";
-import { Flex, Box, Heading } from "@chakra-ui/react"
 import MultisigContext from "./auth/context/multisig";
 import {
+  Flex,
+  Box,
+  Heading,
   Step,
   StepIndicator,
   StepSeparator,
@@ -15,11 +17,10 @@ import {
 
 import InstallPWA from "./install/InstallPWA";
 import Accounts from "./common/accounts";
-import CreateMultisigByScanning from "./multisig/components/CreateMultisigByScanning";
 import JoinMultisig from "./multisig/components/JoinMultisig";
 import CreateTransaction from "./multisig/components/CreateTransaction";
 import CoSign from "./multisig/components/CoSign";
-import { getEOAAddress } from "./auth/services/eoa";
+import { useEOA } from "./auth/context/eoa";
 
 const steps = [
   { title: "EOA" },
@@ -28,7 +29,7 @@ const steps = [
 ]
 
 function App() {
-  const address = getEOAAddress();
+  const { eoaAddress } = useEOA()
   const { multisigData } = useContext(MultisigContext);
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
@@ -36,19 +37,19 @@ function App() {
   })
 
   useEffect(() => {
-    if (address && !multisigData) {
+    if (eoaAddress && !multisigData) {
       setActiveStep(1)
     }
 
-    if (address && multisigData) {
+    if (eoaAddress && multisigData) {
       setActiveStep(2)
     }
-  }, [activeStep, setActiveStep, address, multisigData]);
+  }, [activeStep, setActiveStep, eoaAddress, multisigData]);
 
   return (
   <Flex color={"white"} justifyContent={"center"} minHeight={"100vh"} backgroundColor="blue.100">
       <Flex flex="1" maxWidth={600} flexDirection={"column"}>
-        <Flex alignItems="center" justifyContent="center" px={10} py={50} flexDirection="column">
+        <Flex alignItems="center" justifyContent="center" px={10} pt={50} pb={34} flexDirection="column">
           <img src={logo} alt="qr seal logo" width="200" height="300" style={{ marginBottom: 10 }} />
           <Heading fontWeight={600} fontSize="4xl" color="teal.800" mb="2">QR Seal</Heading>
           <Heading lineHeight="6" fontWeight={400} textAlign="center" fontSize="1xl" color="teal.700">Privacy-Preserving, Gas-Optimized Multisig<br /> via Account Abstraction, ERC-4337 & Schnorr 🤿 Signatures.</Heading>
@@ -77,14 +78,13 @@ function App() {
               <Accounts />
               <Flex flexDirection={"column"}>
                 <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
-                  <CreateMultisigByScanning />
-                  <JoinMultisig />
+                  {eoaAddress && <JoinMultisig />}
                 </Flex>
 
-                {activeStep === 2 && <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
-                  <CreateTransaction />
+                <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
+                  {activeStep === 2 && <CreateTransaction />}
                   <CoSign />
-                </Flex>}
+                </Flex>
 
               </Flex>
           </Flex>

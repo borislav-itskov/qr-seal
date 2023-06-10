@@ -2,7 +2,6 @@ import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
 import { ethers } from "ethers";
 import { useContext, useState } from "react";
 import QRCode from "react-qr-code";
-import { getEOAAddress, getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
 import { useForm } from "react-hook-form";
 import {
   Modal,
@@ -16,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import MultisigContext from "../../auth/context/multisig";
 import getSchnorrkelInstance from "../../singletons/Schnorr";
+import { useEOA } from "../../auth/context/eoa";
 
 interface FormProps {
   to: string;
@@ -23,6 +23,7 @@ interface FormProps {
 }
 
 const CreateTransaction = (props: any) => {
+  const { eoaPrivateKey, eoaPublicKey } = useEOA()
   const { getAllMultisigData } = useContext(MultisigContext)
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -55,7 +56,7 @@ const CreateTransaction = (props: any) => {
       [data.multisigAddr, 31337, 0, txns]
     );
     const publicKeyOne = new Key(
-      Buffer.from(ethers.utils.arrayify(getEOAPublicKey()))
+      Buffer.from(ethers.utils.arrayify(eoaPublicKey))
     );
     const publicKeyTwo = new Key(
       Buffer.from(ethers.utils.arrayify(data.multisigPartnerPublicKey))
@@ -63,7 +64,7 @@ const CreateTransaction = (props: any) => {
     const publicKeys = [publicKeyOne, publicKeyTwo];
     const schnorrkel = getSchnorrkelInstance()
     const privateKey = new Key(
-      Buffer.from(ethers.utils.arrayify(getEOAPrivateKey()))
+      Buffer.from(ethers.utils.arrayify(eoaPrivateKey))
     );
     const partnerNonces = {
       kPublic: Key.fromHex(data.multisigPartnerKPublicHex),
@@ -85,9 +86,9 @@ const CreateTransaction = (props: any) => {
     const sigHex = signature.toHex()
     const kPublicHex = publicNonces.kPublic.toHex();
     const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
-    // const qrCode = getEOAPublicKey() + "|" + kPublicHex + "|" + kTwoPublicHex + "|" + sigHex + "|" + values.to + "|" + values.value.toString()
+    // const qrCode = eoaPublicKey + "|" + kPublicHex + "|" + kTwoPublicHex + "|" + sigHex + "|" + values.to + "|" + values.value.toString()
     const qrCode =
-      getEOAPublicKey() +
+      eoaPublicKey +
       "|" +
       kPublicHex +
       "|" +
@@ -100,7 +101,7 @@ const CreateTransaction = (props: any) => {
       values.value
     setQrCodeValue(qrCode);
     onQrOpen();
-    // console.log(getEOAPublicKey())
+    // console.log(eoaPublicKey)
     // console.log(kPublicHex)
     // console.log(kTwoPublicHex)
     // console.log(sigHex)

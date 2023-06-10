@@ -15,13 +15,15 @@ import {
   getStorageSlotsFromArtifact,
 } from "../../deploy/getBytecode";
 import { ethers } from "ethers";
-import { getEOAPublicKey } from "../../auth/services/eoa";
 import MultisigContext from "../../auth/context/multisig";
 import { AMBIRE_ADDRESS, FACTORY_ADDRESS } from "../../config/constants";
+import { useEOA } from "../../auth/context/eoa";
 
 const CreateMultisigByScanning = (props: any) => {
+  const { eoaPublicKey } = useEOA()
   const { multisigData, createAndStoreMultisigDataIfNeeded } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const handleScanSuccess = (scan: any = "") => {
     const data = scan.split("|");
 
@@ -32,7 +34,7 @@ const CreateMultisigByScanning = (props: any) => {
       return;
     }
 
-    const publicKey = getEOAPublicKey();
+    const publicKey = eoaPublicKey;
     const multisigPartnerPublicKey = data[0];
     const multisigPartnerKPublicHex = data[1];
     const multisigPartnerKTwoPublicHex = data[2];
@@ -77,6 +79,8 @@ const CreateMultisigByScanning = (props: any) => {
     }
   };
   const handleScanError = (error: any) => console.error(error);
+
+  if (!eoaPublicKey) return null
 
   return (
     <>
