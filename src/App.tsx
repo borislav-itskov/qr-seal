@@ -46,11 +46,12 @@ function App() {
   }, [setActiveStep, address, multisigData]);
 
   return (
-  <Flex color={"white"} justifyContent={"center"} alignItems={"center"} minHeight={"100vh"} backgroundColor="blue.100">
+  <Flex color={"white"} justifyContent={"center"} minHeight={"100vh"} backgroundColor="blue.100">
       <Flex flex="1" maxWidth={600} flexDirection={"column"}>
-        <Flex alignItems="center" justifyContent="center" px={10} py={30}>
-          <img src={logo} alt="qr seal logo" width="200" height="300" />
-          <Heading fontWeight={600} fontSize="4xl" ml={4} color="teal.800">QR Seal</Heading>
+        <Flex alignItems="center" justifyContent="center" px={10} py={50} flexDirection="column">
+          <img src={logo} alt="qr seal logo" width="200" height="300" style={{ marginBottom: 10 }} />
+          <Heading fontWeight={600} fontSize="4xl" color="teal.800" mb="2">QR Seal</Heading>
+          <Heading lineHeight="6" fontWeight={400} textAlign="center" fontSize="1xl" color="teal.700">Privacy-Preserving, Gas-Optimized Multisig<br /> via Account Abstraction, ERC-4337 & Schnorr 🤿 Signatures.</Heading>
         </Flex>
         <Flex width={"100%"} flexDirection={"column"}>
             <Stepper index={activeStep} colorScheme="teal" mb={3} gap="2">
