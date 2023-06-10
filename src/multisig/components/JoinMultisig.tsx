@@ -10,16 +10,18 @@ import { utils } from "ethers";
 import { useMemo } from "react";
 import QRCode from "react-qr-code";
 import { getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
+import getSchnorrkelInstance from "../../singletons/Schnorr";
 
 const JoinMultisig = (props: any) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const qrCodeValue = useMemo(() => {
-    const schnorrkel = new Schnorrkel();
+    const schnorrkel = getSchnorrkelInstance();
     const publicKey = getEOAPublicKey();
 
-    const publicNonces = schnorrkel.generatePublicNonces(
-      new Key(Buffer.from(utils.arrayify(getEOAPrivateKey())))
-    );
+    const privateKey = new Key(Buffer.from(utils.arrayify(getEOAPrivateKey())))
+    const publicNonces = schnorrkel.hasNonces(privateKey)
+      ? schnorrkel.getPublicNonces(privateKey)
+      : schnorrkel.generatePublicNonces(privateKey);
 
     const kPublicHex = publicNonces.kPublic.toHex();
     const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
@@ -33,7 +35,7 @@ const JoinMultisig = (props: any) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <QRCode value={qrCodeValue} style={{ padding: 20 }} />
+          <QRCode size={380} value={qrCodeValue} style={{ padding: 20 }} />
         </ModalContent>
       </Modal>
     </>

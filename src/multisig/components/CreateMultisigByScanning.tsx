@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import Blockies from "react-blockies";
 import QRCodeScanner from "../../common/QRCodeScanner";
-import { useState } from "react";
+import { useContext } from "react";
 import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
 import { getAmbireAccountAddress } from "../../utils/helpers";
 import buildinfo from "../../builds/FactoryAndAccountBuild.json";
@@ -20,20 +20,11 @@ import {
 } from "../../deploy/getBytecode";
 import { ethers } from "ethers";
 import { getEOAPublicKey } from "../../auth/services/eoa";
-import {
-  createAndStoreMultisigDataIfNeeded,
-  getAllMultisigData,
-} from "../../auth/services/multisig";
-
-// TODO: Change those when we deploy on a specific network
-const FACTORY_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-const AMBIRE_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+import MultisigContext from "../../auth/context/multisig";
+import { AMBIRE_ADDRESS, FACTORY_ADDRESS } from "../../config/constants";
 
 const CreateMultisigByScanning = (props: any) => {
-  const multisigData = getAllMultisigData();
-  const [multisigPublicAddress, setMultisigPublicAddress] = useState(
-    (multisigData && multisigData.multisigAddr) || ""
-  );
+  const { multisigData, createAndStoreMultisigDataIfNeeded } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const handleScanSuccess = (scan: any = "") => {
     const data = scan.split("|");
@@ -77,7 +68,6 @@ const CreateMultisigByScanning = (props: any) => {
         }
       );
       const multisigAddr = getAmbireAccountAddress(FACTORY_ADDRESS, bytecode);
-      setMultisigPublicAddress(multisigAddr);
 
       // Set data in local storage
       createAndStoreMultisigDataIfNeeded({
@@ -92,13 +82,13 @@ const CreateMultisigByScanning = (props: any) => {
   };
   const handleScanError = (error: any) => console.error(error);
 
-  if (multisigPublicAddress) {
+  if (multisigData && multisigData.multisigAddr) {
     return (
       <Box maxW={"500px"} w={"full"} boxShadow={"2xl"} rounded={"lg"} p={6}>
         <Flex>
           <Box mr={4} rounded="lg">
             <Blockies
-              seed={multisigPublicAddress}
+              seed={multisigData.multisigAddr}
               size={15}
               scale={4}
               className="identicon"
@@ -109,7 +99,7 @@ const CreateMultisigByScanning = (props: any) => {
               Multisig Account Address
             </Text>
             <Text fontSize={"md"} textAlign="left" fontWeight={400}>
-              {multisigPublicAddress}
+              {multisigData.multisigAddr}
             </Text>
           </Box>
         </Flex>
@@ -120,7 +110,7 @@ const CreateMultisigByScanning = (props: any) => {
   return (
     <>
       <Button onClick={onOpen}>Create Multisig</Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
           <QRCodeScanner
