@@ -33,7 +33,7 @@ const JoinMultisig = (props: any) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <QRCode value={qrCodeValue} style={{ padding: 20 }} />
+          <QRCode size={380} value={qrCodeValue} style={{ padding: 20 }} />
         </ModalContent>
       </Modal>
     </>
