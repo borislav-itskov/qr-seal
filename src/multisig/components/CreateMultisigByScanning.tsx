@@ -4,11 +4,7 @@ import {
   ModalContent,
   ModalOverlay,
   useDisclosure,
-  Box,
-  Text,
-  Flex,
 } from "@chakra-ui/react";
-import Blockies from "react-blockies";
 import QRCodeScanner from "../../common/QRCodeScanner";
 import { useContext } from "react";
 import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
@@ -82,34 +78,9 @@ const CreateMultisigByScanning = (props: any) => {
   };
   const handleScanError = (error: any) => console.error(error);
 
-  if (multisigData && multisigData.multisigAddr) {
-    return (
-      <Box maxW={"500px"} w={"full"} boxShadow={"2xl"} rounded={"lg"} p={6}>
-        <Flex>
-          <Box mr={4} rounded="lg">
-            <Blockies
-              seed={multisigData.multisigAddr}
-              size={15}
-              scale={4}
-              className="identicon"
-            />
-          </Box>
-          <Box>
-            <Text fontSize={"lg"} textAlign="left" fontWeight={500} mb={2}>
-              Multisig Account Address
-            </Text>
-            <Text fontSize={"md"} textAlign="left" fontWeight={400}>
-              {multisigData.multisigAddr}
-            </Text>
-          </Box>
-        </Flex>
-      </Box>
-    );
-  }
-
   return (
     <>
-      <Button onClick={onOpen}>Create Multisig</Button>
+      {!multisigData && <Button onClick={onOpen}>Create Multisig</Button> }
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
