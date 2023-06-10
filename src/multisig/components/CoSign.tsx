@@ -7,6 +7,7 @@ import {
     FormLabel,
     Input,
     useDisclosure,
+    useToast,
   } from "@chakra-ui/react";
 import QRCodeScanner from "../../common/QRCodeScanner";
 import { useState, createContext, useContext } from "react";
@@ -18,13 +19,14 @@ import {
   getStorageSlotsFromArtifact,
 } from "../../deploy/getBytecode";
 import { ethers } from "ethers";
-import { getEOAAddress, getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
 import MultisigContext from "../../auth/context/multisig";
 
 import { AMBIRE_ADDRESS, FACTORY_ADDRESS, mainProvider, deployGasLimit } from "../../config/constants";
 import { useForm } from "react-hook-form";
 import getSchnorrkelInstance from "../../singletons/Schnorr";
 import AmbireAccountFactory from '../../builds/AmbireAccountFactory.json'
+import { useEOA } from "../../auth/context/eoa";
+import { useSteps } from "../../auth/context/step";
 
 interface FormProps {
   to: string;
@@ -32,6 +34,9 @@ interface FormProps {
 }
 
 const CoSign = (props: any) => {
+  const toast = useToast()
+  const { setActiveStep } = useSteps()
+  const { eoaPrivateKey, eoaPublicKey } = useEOA()
   const { createAndStoreMultisigDataIfNeeded, getAllMultisigData } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isFormOpen, onOpen: onFormOpen, onClose: onFormClose } = useDisclosure();
@@ -52,7 +57,7 @@ const CoSign = (props: any) => {
       return;
     }
 
-    const publicKey = getEOAPublicKey();
+    const publicKey = eoaPublicKey;
     const multisigPartnerPublicKey = data[0];
     const multisigPartnerKPublicHex = data[1];
     const multisigPartnerKTwoPublicHex = data[2];
@@ -61,7 +66,7 @@ const CoSign = (props: any) => {
     const formValue = data[5];
 
     // HARDCODE VALUES THAT WE WILL REMOVE LATER
-    // const publicKey = getEOAPublicKey();
+    // const publicKey = eoaPublicKey;
     // const multisigPartnerPublicKey = '0x02afc56ffa2958ca5614f22a012f17e2df1a332304677ecc429e2f867f6e7db7bf';
     // const multisigPartnerKPublicHex = '033dd7be8995d101f29cd12bd773e5549bd0ef507f922251197177f9aedaf2d2b6';
     // const multisigPartnerKTwoPublicHex = '03761d7910d20615400cda0d1cac80880145fcb94bc1e0699549c72db68a170df3';
@@ -130,14 +135,14 @@ const CoSign = (props: any) => {
       [data.multisigAddr, 31337, 0, txns]
     );
     const publicKeyOne = new Key(
-      Buffer.from(ethers.utils.arrayify(getEOAPublicKey()))
+      Buffer.from(ethers.utils.arrayify(eoaPublicKey))
     );
     const publicKeyTwo = new Key(
       Buffer.from(ethers.utils.arrayify(data.multisigPartnerPublicKey))
     );
     const publicKeys = [publicKeyOne, publicKeyTwo];
     const privateKey = new Key(
-      Buffer.from(ethers.utils.arrayify(getEOAPrivateKey()))
+      Buffer.from(ethers.utils.arrayify(eoaPrivateKey))
     );
     const partnerNonces = {
       kPublic: Key.fromHex(data.multisigPartnerKPublicHex),
@@ -171,7 +176,7 @@ const CoSign = (props: any) => {
     const ambireSig = wrapSchnorr(sigData)
 
     const wallet = new ethers.Wallet(
-      ethers.utils.arrayify(getEOAPrivateKey()),
+      ethers.utils.arrayify(eoaPrivateKey),
       mainProvider
     )
     const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
@@ -180,6 +185,16 @@ const CoSign = (props: any) => {
       gasPrice: feeData.gasPrice,
       gasLimit: ethers.BigNumber.from(ethers.utils.hexlify(100000000))
     })
+
+    onFormClose()
+    toast({
+      title: 'Successfully signed!',
+      position: 'top',
+      status: 'success',
+      duration: 9000,
+      isClosable: true,
+    })
+    setActiveStep(3)
     // TO DO: show txn hash in polygon scan
   }
 
