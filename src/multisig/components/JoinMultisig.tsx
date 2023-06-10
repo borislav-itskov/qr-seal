@@ -29,7 +29,7 @@ const JoinMultisig = (props: any) => {
 
   return (
     <>
-      <Button onClick={onOpen}>Join Multisig</Button>
+      <Button onClick={onOpen} flex={1} background={"blue.400"} color={"white"} _hover={{ color: "blue.400", background: "white" }} my={3}>Join Multisig</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

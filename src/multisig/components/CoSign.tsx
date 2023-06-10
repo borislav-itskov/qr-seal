@@ -107,7 +107,7 @@ const CoSign = (props: any) => {
 
   return (
     <>
-      <Button onClick={onOpen}>Co-Sign</Button>
+      <Button onClick={onOpen} flex={1} _hover={{ bg: 'transparent', color: "teal.400", borderColor: "teal.400" }} background={"teal.400"} borderWidth={3} borderColor={"teal.400"} color={"white"}>Co-Sign</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

@@ -80,7 +80,7 @@ const CreateMultisigByScanning = (props: any) => {
 
   return (
     <>
-      {!multisigData && <Button onClick={onOpen}>Create Multisig</Button> }
+      {!multisigData && <Button flex={1} background={"blue.400"} color={"white"} _hover={{ color: "blue.400", background: "white" }} onClick={onOpen}>Create Multisig</Button> }
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>

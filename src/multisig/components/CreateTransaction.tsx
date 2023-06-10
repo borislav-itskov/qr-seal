@@ -100,8 +100,8 @@ const CreateTransaction = (props: any) => {
 
   return (
     <>
-      <Button onClick={onOpen}>Create Transaction</Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Button onClick={onOpen}   _hover={{ bg: 'transparent', color: "teal.400", borderColor: "teal.400" }} background={"teal.400"} borderWidth={3} borderColor={"teal.400"} color={"white"} flex={1} my={4}>Create Transaction</Button>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent style={{ padding: 20 }}>
           <h2 style={{ marginBottom: 20 }}>Create Transaction</h2>
