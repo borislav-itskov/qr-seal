@@ -25,3 +25,26 @@ button.html5-qrcode-element {
 #html5qr-code-full-region__header_message {
     font-weight: var(--chakra-fontWeights-semibold);
 }
+
+select.html5-qrcode-element {
+    padding-inline-end: var(--chakra-space-8);
+    display: block;
+    margin: 10px auto;
+    outline: transparent solid 2px;
+    outline-offset: 2px;
+    position: relative;
+    transition-property: var(--chakra-transition-property-common);
+    transition-duration: var(--chakra-transition-duration-normal);
+    padding-bottom: 1px;
+    line-height: var(--chakra-lineHeights-normal);
+    --select-bg: var(--chakra-colors-white);
+    font-size: var(--chakra-fontSizes-md);
+    padding-inline-start: var(--chakra-space-4);
+    height: var(--chakra-sizes-10);
+    border-radius: var(--chakra-radii-md);
+    border-width: 1px;
+    background-color: var(--chakra-colors-blue-100);
+    border-style: solid;
+    border-image: initial;
+    border-color: inherit;
+}
