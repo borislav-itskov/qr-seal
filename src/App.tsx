@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import logo from "./qr-seal-logo-transparent.png";
 import "./App.css";
-import { Flex, Text, Box } from "@chakra-ui/react"
+import { Flex, Text, Box, Heading } from "@chakra-ui/react"
 import MultisigContext from "./auth/context/multisig";
 import {
   Step,
@@ -50,7 +50,7 @@ function App() {
       <Flex flex="1" maxWidth={600} flexDirection={"column"}>
         <Flex alignItems="center" justifyContent="center" px={10} py={30}>
           <img src={logo} alt="qr seal logo" width="200" height="300" />
-          <Text fontWeight="bold" fontSize="4xl"  ml={4}>QR Seal</Text>
+          <Heading fontWeight={500} fontSize="4xl" ml={4}>QR Seal</Heading>
         </Flex>
         <Flex width={"100%"} flexDirection={"column"}>
             <Stepper index={activeStep} colorScheme="teal" mb={3} gap="2">

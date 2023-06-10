@@ -6,19 +6,29 @@ import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./config/service-worker-registration";
 import { createAndStoreEOAIfNeeded } from "./auth/services/eoa";
 import { MultisigProvider } from "./auth/context/multisig";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 
-import { ChakraProvider } from "@chakra-ui/react";
+// TODO: Optimize those by importing only the weights we need
+import '@fontsource-variable/roboto-slab';
+import '@fontsource-variable/open-sans';
 
 // TODO: Init EOA account creation when page is loaded. Ideally, it should
 // prompt the user to create EOA or something.
 createAndStoreEOAIfNeeded();
+
+const theme = extendTheme({
+  fonts: {
+    heading: `'Roboto Slab Variable', sans-serif`,
+    body: `'Open Sans', sans-serif`,
+  },
+})
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   // <React.StrictMode>
-  <ChakraProvider>
+  <ChakraProvider theme={theme}>
     <MultisigProvider>
       <App />
     </MultisigProvider>
