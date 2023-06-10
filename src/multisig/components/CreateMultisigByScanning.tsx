@@ -23,6 +23,7 @@ const CreateMultisigByScanning = (props: any) => {
   const { eoaPublicKey } = useEOA()
   const { multisigData, createAndStoreMultisigDataIfNeeded } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const handleScanSuccess = (scan: any = "") => {
     const data = scan.split("|");
 
@@ -78,6 +79,8 @@ const CreateMultisigByScanning = (props: any) => {
     }
   };
   const handleScanError = (error: any) => console.error(error);
+
+  if (!eoaPublicKey) return null
 
   return (
     <>
