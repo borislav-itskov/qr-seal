@@ -11,19 +11,20 @@ import {
 import QRCodeScanner from "../../common/QRCodeScanner";
 import { useState, createContext, useContext } from "react";
 import Schnorrkel, { Key, Signature } from "@borislav.itskov/schnorrkel.js";
-import { getAmbireAccountAddress } from "../../utils/helpers";
+import { getAmbireAccountAddress, wrapSchnorr } from "../../utils/helpers";
 import buildinfo from "../../builds/FactoryAndAccountBuild.json";
 import {
   getProxyDeployBytecode,
   getStorageSlotsFromArtifact,
 } from "../../deploy/getBytecode";
 import { ethers } from "ethers";
-import { getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
+import { getEOAAddress, getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
 import MultisigContext from "../../auth/context/multisig";
 
-import { AMBIRE_ADDRESS, FACTORY_ADDRESS } from "../../config/constants";
+import { AMBIRE_ADDRESS, FACTORY_ADDRESS, mainProvider, deployGasLimit } from "../../config/constants";
 import { useForm } from "react-hook-form";
 import getSchnorrkelInstance from "../../singletons/Schnorr";
+import AmbireAccountFactory from '../../builds/AmbireAccountFactory.json'
 
 interface FormProps {
   to: string;
@@ -45,31 +46,28 @@ const CoSign = (props: any) => {
     const data = scan.split("|");
 
     // TODO: Validate better if data is multisig!
-    // if (data.length !== 6) {
-    //   alert("Missing all multisig data in the QR code you scanned!");
+    if (data.length !== 6) {
+      alert("Missing all multisig data in the QR code you scanned!");
 
-    //   return;
-    // }
+      return;
+    }
 
-    // open send transaction in readonly-mode, prefilled
-    // put received data in global scope
-
-    // const publicKey = getEOAPublicKey();
-    // const multisigPartnerPublicKey = data[0];
-    // const multisigPartnerKPublicHex = data[1];
-    // const multisigPartnerKTwoPublicHex = data[2];
-    // const multisigPartnerSignature = data[3];
-    // const formTo = data[4];
-    // const formValue = data[5];
+    const publicKey = getEOAPublicKey();
+    const multisigPartnerPublicKey = data[0];
+    const multisigPartnerKPublicHex = data[1];
+    const multisigPartnerKTwoPublicHex = data[2];
+    const multisigPartnerSignature = data[3];
+    const formTo = data[4];
+    const formValue = data[5];
 
     // HARDCODE VALUES THAT WE WILL REMOVE LATER
-    const publicKey = getEOAPublicKey();
-    const multisigPartnerPublicKey = '0x0295cbcef6754d5cd8a68a1585847ffea804d2ce4ee8c4419e012508a4f64def4a';
-    const multisigPartnerKPublicHex = '03faefcee180c54a14cafc051c2e0dfa2348817c6d2d5d842aca25727cc9f2d189';
-    const multisigPartnerKTwoPublicHex = '0266eb9b75229b9ae96d51a0581aee14fbfa90b1aa9676419d898a1369e3621f2c';
-    const multisigPartnerSignature = '0x07172656fe3cbd363520d96f4cbb6a96cc7db4dcefb1c41e0f34d5b612036877';
-    const formTo = '0xCD4D4a1955852c6dC2b8fd7E3FEB7724373DB9Cc'
-    const formValue = '2'
+    // const publicKey = getEOAPublicKey();
+    // const multisigPartnerPublicKey = '0x02afc56ffa2958ca5614f22a012f17e2df1a332304677ecc429e2f867f6e7db7bf';
+    // const multisigPartnerKPublicHex = '033dd7be8995d101f29cd12bd773e5549bd0ef507f922251197177f9aedaf2d2b6';
+    // const multisigPartnerKTwoPublicHex = '03761d7910d20615400cda0d1cac80880145fcb94bc1e0699549c72db68a170df3';
+    // const multisigPartnerSignature = '439d20128e356b51e567abfaefa29ebf351a4831bf3e621230a51c1af3517413';
+    // const formTo = '0xCD4D4a1955852c6dC2b8fd7E3FEB7724373DB9Cc'
+    // const formValue = '2'
 
     const publicKeyOne = new Key(Buffer.from(ethers.utils.arrayify(publicKey)));
     const publicKeyTwo = new Key(
@@ -101,7 +99,9 @@ const CoSign = (props: any) => {
       "multisigPartnerKPublicHex": multisigPartnerKPublicHex,
       "multisigPartnerKTwoPublicHex": multisigPartnerKTwoPublicHex,
       "multisigAddr": multisigAddr,
-      "multisigPartnerSignature": multisigPartnerSignature
+      "multisigPartnerSignature": multisigPartnerSignature,
+      "combinedPublicKey": combinedPublicKey,
+      "bytecode": bytecode
     })
 
     onClose();
@@ -112,7 +112,7 @@ const CoSign = (props: any) => {
   const handleScanError = (error: any) => console.error(error);
 
   // sign and submit the transaction
-  const onSubmit = (values: FormProps) => {
+  const onSubmit = async (values: FormProps) => {
     const data = getAllMultisigData();
     if (!data) return
 
@@ -145,9 +145,11 @@ const CoSign = (props: any) => {
     };
     const schnorrkel = getSchnorrkelInstance()
     const publicNonces = schnorrkel.getPublicNonces(privateKey)
+    // console.log(publicNonces.kPublic.toHex())
+    // console.log(publicNonces.kTwoPublic.toHex())
     const combinedPublicNonces = [publicNonces, partnerNonces];
     const hashFn = ethers.utils.keccak256;
-    const { signature } = schnorrkel.multiSigSign(
+    const { signature, challenge, finalPublicNonce } = schnorrkel.multiSigSign(
       privateKey,
       msg,
       publicKeys,
@@ -156,7 +158,32 @@ const CoSign = (props: any) => {
     );
     const partnerSig = Signature.fromHex(data.multisigPartnerSignature)
     const summedSig = Schnorrkel.sumSigs([signature, partnerSig])
-    console.log(summedSig)
+    const verification = Schnorrkel.verify(summedSig, msg, finalPublicNonce, data.combinedPublicKey, hashFn)
+    console.log('VERIFICATION: ' + verification)
+    expect(verification).to.equal(true)
+
+    const px = ethers.utils.hexlify(data.combinedPublicKey.buffer.slice(1, 33));
+    const parity = data.combinedPublicKey.buffer[0] - 2 + 27
+    
+    const sigData = abiCoder.encode([ 'bytes32', 'bytes32', 'bytes32', 'uint8' ], [
+      px,
+      challenge.buffer,
+      summedSig.buffer,
+      parity
+    ])
+    const ambireSig = wrapSchnorr(sigData)
+
+    const wallet = new ethers.Wallet(
+      ethers.utils.arrayify(getEOAPrivateKey()),
+      mainProvider
+    )
+    const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
+    // const deployment = await factory.deploy(data.bytecode, 0)
+    console.log(data.bytecode)
+    console.log(txns)
+    console.log(ambireSig)
+    const deployment = await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig)
+    console.log(deployment)
   }
 
   return (

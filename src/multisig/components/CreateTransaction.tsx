@@ -2,7 +2,7 @@ import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
 import { ethers } from "ethers";
 import { useContext, useState } from "react";
 import QRCode from "react-qr-code";
-import { getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
+import { getEOAAddress, getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
 import { useForm } from "react-hook-form";
 import {
   Modal,
@@ -69,6 +69,9 @@ const CreateTransaction = (props: any) => {
       kPublic: Key.fromHex(data.multisigPartnerKPublicHex),
       kTwoPublic: Key.fromHex(data.multisigPartnerKTwoPublicHex),
     };
+    console.log(partnerNonces.kPublic.toHex())
+    console.log(partnerNonces.kTwoPublic.toHex())
+
     const publicNonces = schnorrkel.generatePublicNonces(privateKey);
     const combinedPublicNonces = [publicNonces, partnerNonces];
     const hashFn = ethers.utils.keccak256;
@@ -97,12 +100,12 @@ const CreateTransaction = (props: any) => {
       values.value
     setQrCodeValue(qrCode);
     onQrOpen();
-    console.log(getEOAPublicKey())
-    console.log(kPublicHex)
-    console.log(kTwoPublicHex)
-    console.log(sigHex)
-    console.log(values.to)
-    console.log(values.value)
+    // console.log(getEOAPublicKey())
+    // console.log(kPublicHex)
+    // console.log(kTwoPublicHex)
+    // console.log(sigHex)
+    // console.log(values.to)
+    // console.log(values.value)
     return new Promise((resolve) => resolve(true));
   };
 

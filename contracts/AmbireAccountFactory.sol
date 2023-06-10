@@ -28,6 +28,7 @@ contract AmbireAccountFactory {
 		AmbireAccount.Transaction[] calldata txns,
 		bytes calldata signature
 	) external {
+		console.log(999999);
 		address payable addr = payable(deploySafe(code, salt));
 		AmbireAccount(addr).execute(txns, signature);
 	}

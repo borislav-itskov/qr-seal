@@ -18,9 +18,10 @@ const JoinMultisig = (props: any) => {
     const schnorrkel = getSchnorrkelInstance();
     const publicKey = getEOAPublicKey();
 
-    const publicNonces = schnorrkel.generatePublicNonces(
-      new Key(Buffer.from(utils.arrayify(getEOAPrivateKey())))
-    );
+    const privateKey = new Key(Buffer.from(utils.arrayify(getEOAPrivateKey())))
+    const publicNonces = schnorrkel.hasNonces(privateKey)
+      ? schnorrkel.getPublicNonces(privateKey)
+      : schnorrkel.generatePublicNonces(privateKey);
 
     const kPublicHex = publicNonces.kPublic.toHex();
     const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
