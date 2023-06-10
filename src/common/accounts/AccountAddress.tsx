@@ -50,16 +50,18 @@ const AccountAddress = ({
           </Box>
         </Flex>
       ) : type === "eoa" ? (
-        <Button
-          onClick={onCreate}
-          flex={1}
-          background={"blue.400"}
-          color={"white"}
-          _hover={{ color: "blue.400", background: "white" }}
-          my={3}
-        >
-          Create EOA
-        </Button>
+        <Flex alignItems="center">
+          <Button
+            onClick={onCreate}
+            flex={1}
+            background={"blue.400"}
+            color={"white"}
+            _hover={{ color: "blue.400", background: "white" }}
+            my={3}
+            >
+            Create EOA
+          </Button>
+        </Flex>
       ) : (
         <CreateMultisigByScanning />
       )}

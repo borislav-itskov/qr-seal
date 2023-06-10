@@ -1,7 +1,4 @@
-import React, { useContext, useEffect } from "react";
 import logo from "./qr-seal-logo-transparent.png";
-import "./App.css";
-import MultisigContext from "./auth/context/multisig";
 import {
   Flex,
   Box,
@@ -14,7 +11,6 @@ import {
   Stepper,
 } from "@chakra-ui/react"
 
-import InstallPWA from "./install/InstallPWA";
 import Accounts from "./common/accounts";
 import JoinMultisig from "./multisig/components/JoinMultisig";
 import CreateTransaction from "./multisig/components/CreateTransaction";
@@ -31,6 +27,7 @@ const steps = [
 function App() {
   const { eoaAddress } = useEOA()
   const { activeStep } = useSteps()
+  const isMobile = window.innerWidth <= 430
 
   return (
   <Flex color={"white"} justifyContent={"center"} minHeight={"100vh"} backgroundColor="blue.100">
@@ -41,7 +38,7 @@ function App() {
           <Heading lineHeight="6" fontWeight={400} textAlign="center" fontSize="1xl" color="teal.700">Privacy-Preserving, Gas-Optimized Multisig<br /> via Account Abstraction, ERC-4337 & Schnorr 🤿 Signatures.</Heading>
         </Flex>
         <Flex width={"100%"} flexDirection={"column"}>
-            <Stepper index={activeStep} colorScheme="teal" mb={3} variant="withCustomIndicatorSize" size={"lg"} gap="2">
+            <Stepper index={activeStep} colorScheme="teal" mb={3} variant="withCustomIndicatorSize" size={isMobile ? "md" : "lg"} gap={isMobile? "1" : "2"}>
               {steps.map((step, index) => (
                   <Step key={index}>
                     {/* @ts-ignore */}
@@ -51,7 +48,7 @@ function App() {
                     </StepIndicator>
                     <Box flexShrink="0">
                       {/* @ts-ignore */}
-                      <StepTitle color="teal.600" fontWeight={800}>{step.title}</StepTitle>
+                      <StepTitle color="teal.600" fontSize={isMobile ? "sm": "xl"} fontWeight={800}>{step.title}</StepTitle>
                     </Box>
                     {/* @ts-ignore */}
                     <StepSeparator bg={step > activeStep ? 'teal.500' : 'teal.300'} />

@@ -1,4 +1,5 @@
 import {
+  Flex,
   Button,
   Modal,
   ModalContent,
@@ -98,7 +99,9 @@ const CreateMultisigByScanning = (props: any) => {
 
   return (
     <>
-      {!multisigData && <Button flex={1} background={"blue.400"} color={"white"} _hover={{ color: "blue.400", background: "white" }} onClick={onOpen}>Create Multisig</Button> }
+      {!multisigData && (<Flex alignItems={"center"} flex="1" alignSelf={"center"} height="100%">
+      <Button flex={1} background={"blue.400"} color={"white"} _hover={{ color: "blue.400", background: "white" }} onClick={onOpen}>Create Multisig</Button>
+      </Flex>)}
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
