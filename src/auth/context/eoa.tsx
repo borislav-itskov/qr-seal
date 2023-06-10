@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { utils } from 'ethers';
+import { useSteps } from './step';
+import { useToast } from '@chakra-ui/react';
 
 const STORAGE_KEY_EOA = 'eoa-private-key';
 
@@ -20,6 +22,8 @@ const EOAContext = createContext<EOAContextType>({
 export const useEOA = () => useContext(EOAContext);
 
 export const EOAProvider: React.FC<any> = ({ children }) => {
+  const toast = useToast();
+  const { setActiveStep } = useSteps()
   const [eoaPrivateKey, setEOAPrivateKey] = useState<string>('');
   const [eoaPublicKey, setEOAPublicKey] = useState<string>('');
   const [eoaAddress, setEOAAddress] = useState<string>('');
@@ -34,7 +38,16 @@ export const EOAProvider: React.FC<any> = ({ children }) => {
     const privateKeyHex = utils.hexlify(privateKeyBytes);
     localStorage.setItem(STORAGE_KEY_EOA, privateKeyHex);
     setEOAPrivateKey(privateKeyHex);
-  }, []);
+    setActiveStep(1)
+    toast({
+      title: 'EOA created!',
+      description: 'You can now create a multisig wallet.',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+      position: 'top'
+    });
+  }, [setActiveStep, toast]);
 
   useEffect(() => {
     if (eoaPrivateKey) {

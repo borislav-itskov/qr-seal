@@ -26,6 +26,7 @@ import { useForm } from "react-hook-form";
 import getSchnorrkelInstance from "../../singletons/Schnorr";
 import AmbireAccountFactory from '../../builds/AmbireAccountFactory.json'
 import { useEOA } from "../../auth/context/eoa";
+import { useSteps } from "../../auth/context/step";
 
 interface FormProps {
   to: string;
@@ -34,6 +35,7 @@ interface FormProps {
 
 const CoSign = (props: any) => {
   const toast = useToast()
+  const { setActiveStep } = useSteps()
   const { eoaPrivateKey, eoaPublicKey } = useEOA()
   const { createAndStoreMultisigDataIfNeeded, getAllMultisigData } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -189,6 +191,7 @@ const CoSign = (props: any) => {
       duration: 9000,
       isClosable: true,
     })
+    setActiveStep(3)
 
     // TO DO: get transaction hash and display a link to a scanner
   }

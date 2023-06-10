@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import logo from "./qr-seal-logo-transparent.png";
 import "./App.css";
-import MultisigContext from "./auth/context/multisig";
 import {
   Flex,
   Box,
@@ -12,7 +11,6 @@ import {
   StepStatus,
   StepTitle,
   Stepper,
-  useSteps,
   Text,
   Link,
   useColorModeValue,
@@ -25,6 +23,7 @@ import JoinMultisig from "./multisig/components/JoinMultisig";
 import CreateTransaction from "./multisig/components/CreateTransaction";
 import CoSign from "./multisig/components/CoSign";
 import { useEOA } from "./auth/context/eoa";
+import { useSteps } from "./auth/context/step";
 
 const steps = [
   { title: "EOA" },
@@ -33,22 +32,8 @@ const steps = [
 ];
 
 function App() {
-  const { eoaAddress } = useEOA();
-  const { multisigData } = useContext(MultisigContext);
-  const { activeStep, setActiveStep } = useSteps({
-    index: 0,
-    count: steps.length,
-  });
-
-  useEffect(() => {
-    if (eoaAddress && !multisigData) {
-      setActiveStep(1);
-    }
-
-    if (eoaAddress && multisigData) {
-      setActiveStep(2);
-    }
-  }, [activeStep, setActiveStep, eoaAddress, multisigData]);
+  const { eoaAddress } = useEOA()
+  const { activeStep } = useSteps()
 
   return (
     <Flex
