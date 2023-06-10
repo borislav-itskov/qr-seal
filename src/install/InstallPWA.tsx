@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Box, Button } from "@chakra-ui/react";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -9,7 +10,6 @@ interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
 }
 
-// TODO: Figure out why this works on MacOS Chrome only, but not on Android or iOS Chrome
 const InstallPWA: React.FC = () => {
   const [installable, setInstallable] = useState<boolean>(false);
   const [installPromptEvent, setInstallPromptEvent] =
@@ -45,15 +45,20 @@ const InstallPWA: React.FC = () => {
   };
 
   return (
-    <>
-      <p>
-        QR Seal can be installed on your device. Press the button below to
-        install:
-      </p>
-      <button onClick={handleClick} disabled={!installable}>
-        Install App
-      </button>
-    </>
+    <Box
+      position="fixed"
+      bottom="1rem"
+      right="1rem"
+      zIndex="999"
+      bg="white"
+      p={3}
+      boxShadow="md"
+      borderRadius="md"
+    >
+      <Button onClick={handleClick} disabled={!installable} colorScheme="blue">
+        Install (PWA) App
+      </Button>
+    </Box>
   );
 };
 
