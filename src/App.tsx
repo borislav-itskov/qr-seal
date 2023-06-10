@@ -55,7 +55,7 @@ function App() {
           <Heading lineHeight="6" fontWeight={400} textAlign="center" fontSize="1xl" color="teal.700">Privacy-Preserving, Gas-Optimized Multisig<br /> via Account Abstraction, ERC-4337 & Schnorr 🤿 Signatures.</Heading>
         </Flex>
         <Flex width={"100%"} flexDirection={"column"}>
-            <Stepper index={activeStep} colorScheme="teal" mb={3} gap="2">
+            <Stepper index={activeStep} colorScheme="teal" mb={3} variant="withCustomIndicatorSize" size={"lg"} gap="2">
               {steps.map((step, index) => (
                   <Step key={index}>
                     {/* @ts-ignore */}

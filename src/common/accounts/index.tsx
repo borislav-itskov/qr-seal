@@ -10,10 +10,10 @@ const Accounts = () => {
 
   return (
     <Flex flexDirection={"column"} mb={3}>
-      <Heading textAlign={"center"} color={"teal.500"} fontSize={"xl"}>My Addresses</Heading>
-      <Flex justifyContent={"space-between"} gap={"2"}>
-        <AccountAddress type="eoa" address={eoaAddress} createAndStoreEOA={createAndStoreEOA} addressType="Externaly Owned Account (EOA)" />
-        <AccountAddress type="multisig" address={multisigData.multisigAddr} addressType="Account Abstraction Smart Account (Multisig)" />
+      <Heading textAlign={"center"} color={"teal.500"} mb={3} fontSize={"xl"}>My Addresses</Heading>
+      <Flex flexDirection={['column','row']} justifyContent={"space-between"} gap={"2"}>
+        <AccountAddress type="eoa" address={eoaAddress} addressType="Externaly Owned Account (EOA)" onCreate={createAndStoreEOA} />
+        <AccountAddress type="multisig" address={multisigData.multisigAddr} addressType="Multisig (Smart Account)" />
       </Flex>
     </Flex>
 

@@ -6,11 +6,11 @@ import CreateMultisigByScanning from "../../multisig/components/CreateMultisigBy
 const AccountAddress = ({
   address,
   addressType,
-  createAndStoreEOA,
+  onCreate,
   type,
 }: any) => {
   return (
-    <Box flex={1} maxW={"300px"} boxShadow={"2xl"} rounded={"lg"} p={6}>
+    <Box flex={1} maxW={["100%","300px"]} boxShadow={"2xl"} rounded={"lg"} p={6}>
       {address ? (
         <Flex flexDirection={"column"}>
           <Flex alignItems={"center"} mb={1}>
@@ -51,7 +51,7 @@ const AccountAddress = ({
         </Flex>
       ) : type === "eoa" ? (
         <Button
-          onClick={createAndStoreEOA}
+          onClick={onCreate}
           flex={1}
           background={"blue.400"}
           color={"white"}
