@@ -10,7 +10,7 @@ const Accounts = () => {
   return (
     <Flex flexDirection={"column"} mb={3}>
       <Text textAlign={"center"} color={"teal.500"} fontSize={"xl"}>My Addresses</Text>
-      <Flex>
+      <Flex justifyContent={"space-between"} gap={"2"}>
         <AccountAddress address={address} addressType="EOA" />
         <AccountAddress address={multisigData.multisigAddr} addressType="Multisig" />
       </Flex>
