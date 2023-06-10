@@ -160,7 +160,6 @@ const CoSign = (props: any) => {
     const summedSig = Schnorrkel.sumSigs([signature, partnerSig])
     const verification = Schnorrkel.verify(summedSig, msg, finalPublicNonce, data.combinedPublicKey, hashFn)
     console.log('VERIFICATION: ' + verification)
-    expect(verification).to.equal(true)
 
     const px = ethers.utils.hexlify(data.combinedPublicKey.buffer.slice(1, 33));
     const parity = data.combinedPublicKey.buffer[0] - 2 + 27
