@@ -1,6 +1,6 @@
 const STORAGE_KEY_MULTISIG = "multisig-data";
 
-interface MultisigData {
+export interface MultisigData {
   multisigPartnerPublicKey: string;
   multisigPartnerKPublicHex: string;
   multisigPartnerKTwoPublicHex: string;
