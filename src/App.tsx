@@ -13,9 +13,10 @@ import {
   StepTitle,
   Stepper,
   useSteps,
-} from "@chakra-ui/react"
+  Text,
+  Link
+} from "@chakra-ui/react";
 
-import InstallPWA from "./install/InstallPWA";
 import Accounts from "./common/accounts";
 import JoinMultisig from "./multisig/components/JoinMultisig";
 import CreateTransaction from "./multisig/components/CreateTransaction";
@@ -25,51 +26,96 @@ import { useEOA } from "./auth/context/eoa";
 const steps = [
   { title: "EOA" },
   { title: "Multisig" },
-  { title: "Transaction"},
-]
+  { title: "Transaction" },
+];
 
 function App() {
-  const { eoaAddress } = useEOA()
+  const { eoaAddress } = useEOA();
   const { multisigData } = useContext(MultisigContext);
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
     count: steps.length,
-  })
+  });
 
   useEffect(() => {
     if (eoaAddress && !multisigData) {
-      setActiveStep(1)
+      setActiveStep(1);
     }
 
     if (eoaAddress && multisigData) {
-      setActiveStep(2)
+      setActiveStep(2);
     }
   }, [activeStep, setActiveStep, eoaAddress, multisigData]);
 
   return (
-  <Flex color={"white"} justifyContent={"center"} minHeight={"100vh"} backgroundColor="blue.100">
-      <Flex flex="1" maxWidth={600} flexDirection={"column"}>
-        <Flex alignItems="center" justifyContent="center" px={10} pt={50} pb={34} flexDirection="column">
-          <img src={logo} alt="qr seal logo" width="200" height="300" style={{ marginBottom: 10 }} />
-          <Heading fontWeight={600} fontSize="4xl" color="teal.800" mb="2">QR Seal</Heading>
-          <Heading lineHeight="6" fontWeight={400} textAlign="center" fontSize="1xl" color="teal.700">Privacy-Preserving, Gas-Optimized Multisig<br /> via Account Abstraction, ERC-4337 & Schnorr 🤿 Signatures.</Heading>
-        </Flex>
-        <Flex width={"100%"} flexDirection={"column"}>
-            <Stepper index={activeStep} colorScheme="teal" mb={3} variant="withCustomIndicatorSize" size={"lg"} gap="2">
+    <Flex
+      color={"white"}
+      minHeight={"100vh"}
+      backgroundColor="blue.100"
+      flexDirection={"column"}
+      justifyContent={"space-between"}
+    >
+      <Flex
+        justifyContent={"center"}
+      >
+        <Flex flex="1" maxWidth={600} flexDirection={"column"}>
+          <Flex
+            alignItems="center"
+            justifyContent="center"
+            px={10}
+            pt={50}
+            pb={34}
+            flexDirection="column"
+          >
+            <img
+              src={logo}
+              alt="qr seal logo"
+              width="200"
+              height="300"
+              style={{ marginBottom: 10 }}
+            />
+            <Heading fontWeight={600} fontSize="4xl" color="teal.800" mb="2">
+              QR Seal
+            </Heading>
+            <Heading
+              lineHeight="6"
+              fontWeight={400}
+              textAlign="center"
+              fontSize="1xl"
+              color="teal.700"
+            >
+              Privacy-Preserving, Gas-Optimized Multisig
+              <br /> via Account Abstraction, ERC-4337 & Schnorr 🤿 Signatures.
+            </Heading>
+          </Flex>
+          <Flex width={"100%"} flexDirection={"column"}>
+            <Stepper
+              index={activeStep}
+              colorScheme="teal"
+              mb={3}
+              variant="withCustomIndicatorSize"
+              size={"lg"}
+              gap="2"
+            >
               {steps.map((step, index) => (
-                  <Step key={index}>
-                    {/* @ts-ignore */}
-                    <StepIndicator borderColor={step > activeStep ? 'teal.500' : 'teal.300'}>
+                <Step key={index}>
+                  {/* @ts-ignore */}
+                  <StepIndicator borderColor={step > activeStep ? "teal.500" : "teal.300"}>
                     <StepStatus
-                    complete={`✅`} incomplete={`${index === 1 ? `🤿` : `✉️`}`} active={`${index === 1 ? `🤿` : `✉️`}`} />
-                    </StepIndicator>
-                    <Box flexShrink="0">
-                      {/* @ts-ignore */}
-                      <StepTitle color="teal.600" fontWeight={800}>{step.title}</StepTitle>
-                    </Box>
+                      complete={`✅`}
+                      incomplete={`${index === 1 ? `🤿` : `✉️`}`}
+                      active={`${index === 1 ? `🤿` : `✉️`}`}
+                    />
+                  </StepIndicator>
+                  <Box flexShrink="0">
                     {/* @ts-ignore */}
-                    <StepSeparator bg={step > activeStep ? 'teal.500' : 'teal.300'} />
-                  </Step>
+                    <StepTitle color="teal.600" fontWeight={800}>
+                      {step.title}
+                    </StepTitle>
+                  </Box>
+                  {/* @ts-ignore */}
+                  <StepSeparator  bg={step > activeStep ? "teal.500" : "teal.300"} />
+                </Step>
               ))}
             </Stepper>
             <Flex flexDirection={"column"} flex={1}>
@@ -85,10 +131,20 @@ function App() {
                   {activeStep === 2 && <CreateTransaction />}
                   <CoSign />
                 </Flex>
-
               </Flex>
+            </Flex>
           </Flex>
         </Flex>
+      </Flex>
+      <Flex justifyContent="center" position="sticky" bottom="0" px={5} py={4} borderTop={'1px solid'} borderColor={"teal.900"}>
+        <Text color="teal.900" fontWeight="light" >
+          Built at{" "}
+          <Link href="https://ethprague.com/" transition="all 0.4s"  _hover={{ opacity: 0.6 }} textDecoration="underline" target="_blank" rel="noreferrer">
+            ETH Prague 2023
+          </Link>
+          {" "}with lots of ❤️ by Gery, Kalo and Bobby.{" "}<Link transition="all 0.4s" _hover={{ opacity: 0.6 }} href="https://github.com/borislav-itskov/qr-seal" textDecoration="underline" target="_blank" rel="noreferrer">
+          Github link.</Link>
+        </Text>
       </Flex>
     </Flex>
   );
