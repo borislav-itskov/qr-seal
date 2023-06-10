@@ -63,7 +63,8 @@ function App() {
                   </StepIndicator>
 
                   <Box flexShrink="0">
-                    <StepTitle>{step.title}</StepTitle>
+                    {/* @ts-ignore */}
+                    <StepTitle color="teal.600" fontWeight={800}>{step.title}</StepTitle>
                   </Box>
 
                   <StepSeparator />
