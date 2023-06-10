@@ -17,10 +17,7 @@ import {
 import { ethers } from "ethers";
 import { getEOAPublicKey } from "../../auth/services/eoa";
 import MultisigContext from "../../auth/context/multisig";
-
-// TODO: Change those when we deploy on a specific network
-const FACTORY_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-const AMBIRE_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+import { AMBIRE_ADDRESS, FACTORY_ADDRESS } from "../../config/constants";
 
 const CreateMultisigByScanning = (props: any) => {
   const { multisigData, createAndStoreMultisigDataIfNeeded } = useContext(MultisigContext)

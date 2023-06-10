@@ -27,9 +27,9 @@ export const getMultisigDataFromLocalStorage = () => {
 };
 
 
-const MultisigContext = createContext({
+const MultisigContext = createContext<any>({
   multisigData: getMultisigDataFromLocalStorage(),
-  createAndStoreMultisigDataIfNeeded: (multisigData: MultisigData) => {}, 
+  createAndStoreMultisigDataIfNeeded: (data: any) => {}, 
   getAllMultisigData: () => getMultisigDataFromLocalStorage(),
 });
 
