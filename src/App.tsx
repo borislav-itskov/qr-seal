@@ -50,7 +50,7 @@ function App() {
       <Flex flex="1" maxWidth={600} flexDirection={"column"}>
         <Flex alignItems="center" justifyContent="center" px={10} py={30}>
           <img src={logo} alt="qr seal logo" width="200" height="300" />
-          <Heading fontWeight={500} fontSize="4xl" ml={4}>QR Seal</Heading>
+          <Heading fontWeight={600} fontSize="4xl" ml={4} color="teal.800">QR Seal</Heading>
         </Flex>
         <Flex width={"100%"} flexDirection={"column"}>
             <Stepper index={activeStep} colorScheme="teal" mb={3} gap="2">
