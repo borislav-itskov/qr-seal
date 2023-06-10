@@ -56,19 +56,19 @@ function App() {
         <Flex width={"100%"} flexDirection={"column"}>
             <Stepper index={activeStep} colorScheme="teal" mb={3} gap="2">
               {steps.map((step, index) => (
-                <Step key={index}>
-                  <StepIndicator>
-                  <StepStatus
-                  complete={`✅`} incomplete={`${index === 1 ? `🤿` : `✉️`}`} active={`${index === 1 ? `🤿` : `✉️`}`} />
-                  </StepIndicator>
-
-                  <Box flexShrink="0">
+                  <Step key={index}>
                     {/* @ts-ignore */}
-                    <StepTitle color="teal.600" fontWeight={800}>{step.title}</StepTitle>
-                  </Box>
-
-                  <StepSeparator />
-                </Step>
+                    <StepIndicator borderColor={step > activeStep ? 'teal.500' : 'teal.300'}>
+                    <StepStatus
+                    complete={`✅`} incomplete={`${index === 1 ? `🤿` : `✉️`}`} active={`${index === 1 ? `🤿` : `✉️`}`} />
+                    </StepIndicator>
+                    <Box flexShrink="0">
+                      {/* @ts-ignore */}
+                      <StepTitle color="teal.600" fontWeight={800}>{step.title}</StepTitle>
+                    </Box>
+                    {/* @ts-ignore */}
+                    <StepSeparator bg={step > activeStep ? 'teal.500' : 'teal.300'} />
+                  </Step>
               ))}
             </Stepper>
             <Flex flexDirection={"column"} flex={1}>
