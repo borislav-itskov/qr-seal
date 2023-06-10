@@ -12,7 +12,6 @@ import {
   StepStatus,
   StepTitle,
   Stepper,
-  useSteps,
 } from "@chakra-ui/react"
 
 import InstallPWA from "./install/InstallPWA";
@@ -21,6 +20,7 @@ import JoinMultisig from "./multisig/components/JoinMultisig";
 import CreateTransaction from "./multisig/components/CreateTransaction";
 import CoSign from "./multisig/components/CoSign";
 import { useEOA } from "./auth/context/eoa";
+import { useSteps } from "./auth/context/step";
 
 const steps = [
   { title: "EOA" },
@@ -30,21 +30,7 @@ const steps = [
 
 function App() {
   const { eoaAddress } = useEOA()
-  const { multisigData } = useContext(MultisigContext);
-  const { activeStep, setActiveStep } = useSteps({
-    index: 0,
-    count: steps.length,
-  })
-
-  useEffect(() => {
-    if (eoaAddress && !multisigData) {
-      setActiveStep(1)
-    }
-
-    if (eoaAddress && multisigData) {
-      setActiveStep(2)
-    }
-  }, [activeStep, setActiveStep, eoaAddress, multisigData]);
+  const { activeStep } = useSteps()
 
   return (
   <Flex color={"white"} justifyContent={"center"} minHeight={"100vh"} backgroundColor="blue.100">

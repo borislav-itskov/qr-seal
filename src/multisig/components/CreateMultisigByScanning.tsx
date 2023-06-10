@@ -4,6 +4,7 @@ import {
   ModalContent,
   ModalOverlay,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import QRCodeScanner from "../../common/QRCodeScanner";
 import { useContext } from "react";
@@ -18,8 +19,11 @@ import { ethers } from "ethers";
 import MultisigContext from "../../auth/context/multisig";
 import { AMBIRE_ADDRESS, FACTORY_ADDRESS } from "../../config/constants";
 import { useEOA } from "../../auth/context/eoa";
+import { useSteps } from "../../auth/context/step";
 
 const CreateMultisigByScanning = (props: any) => {
+  const toast = useToast()
+  const { setActiveStep } = useSteps()
   const { eoaPublicKey } = useEOA()
   const { multisigData, createAndStoreMultisigDataIfNeeded } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -74,6 +78,16 @@ const CreateMultisigByScanning = (props: any) => {
         multisigPartnerKTwoPublicHex: multisigPartnerKTwoPublicHex,
         multisigAddr: multisigAddr,
       });
+
+      setActiveStep(2)
+      toast({
+        title: "Multisig created.",
+        description: "You can now create a transaction.",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+        position: 'top'
+      })
     } catch (e) {
       console.log("The multisig creation failed", e);
     }

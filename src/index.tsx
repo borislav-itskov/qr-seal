@@ -11,6 +11,7 @@ import { EOAProvider } from "./auth/context/eoa";
 // TODO: Optimize those by importing only the weights we need
 import '@fontsource-variable/roboto-slab';
 import '@fontsource-variable/open-sans';
+import { StepProvider } from "./auth/context/step";
 
 const theme = extendTheme({
   fonts: {
@@ -25,11 +26,13 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <ChakraProvider theme={theme}>
-    <EOAProvider>
-      <MultisigProvider>
-        <App />
-      </MultisigProvider>
-    </EOAProvider>
+    <StepProvider>
+      <EOAProvider>
+        <MultisigProvider>
+          <App />
+        </MultisigProvider>
+      </EOAProvider>
+    </StepProvider>
   </ChakraProvider>
   // </React.StrictMode>
 );
