@@ -22,11 +22,6 @@ button.html5-qrcode-element {
     color: var(--chakra-colors-white);
 }
 
-span.html5-qrcode-element {
-    display: none !important;
-}
-
-
 #html5qr-code-full-region__header_message {
     font-weight: var(--chakra-fontWeights-semibold);
 }
