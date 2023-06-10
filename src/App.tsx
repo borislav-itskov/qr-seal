@@ -46,7 +46,7 @@ function App() {
   }, [setActiveStep, address, multisigData]);
 
   return (
-  <Flex color={"white"} justifyContent={"center"} alignItems={"center"} minHeight={"100vh"} backgroundColor={"#282c34"}>
+  <Flex color={"white"} justifyContent={"center"} alignItems={"center"} minHeight={"100vh"} backgroundColor="blue.100">
       <Flex flex="1" maxWidth={600} flexDirection={"column"}>
         <Flex alignItems="center" justifyContent="center" px={10} py={30}>
           <img src={logo} alt="qr seal logo" width="200" height="300" />
