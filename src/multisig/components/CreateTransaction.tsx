@@ -25,7 +25,11 @@ const CreateTransaction = (props: any) => {
   const { getAllMultisigData } = useContext(MultisigContext)
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isOpen: isQrOpen, onOpen: onQrOpen, onClose: onQrClose } = useDisclosure();
+  const {
+    isOpen: isQrOpen,
+    onOpen: onQrOpen,
+    onClose: onQrClose,
+  } = useDisclosure();
   const [qrCodeValue, setQrCodeValue] = useState("");
   const {
     handleSubmit,
@@ -34,36 +38,64 @@ const CreateTransaction = (props: any) => {
   } = useForm<FormProps>();
 
   const onSubmit = (values: FormProps) => {
-    const data = getAllMultisigData()
+    const data = getAllMultisigData();
     if (!data) return
-    const abiCoder = new ethers.utils.AbiCoder()
-    const sendTosignerTxn = [values.to, ethers.utils.parseEther(values.value.toString()), '0x00']
-    const txns = [sendTosignerTxn]
+    const abiCoder = new ethers.utils.AbiCoder();
+    const sendTosignerTxn = [
+      values.to,
+      ethers.utils.parseEther(values.value.toString()),
+      "0x00",
+    ];
+    const txns = [sendTosignerTxn];
     // TO DO: the nonce is hardcoded to 0 here.
     // change it to read from the contract if any
-    const msg = abiCoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [data.multisigAddr, 31337, 0, txns])
-    const publicKeyOne = new Key(Buffer.from(ethers.utils.arrayify(getEOAPublicKey())));
-    const publicKeyTwo = new Key(Buffer.from(ethers.utils.arrayify(data.multisigPartnerPublicKey)));
-    const publicKeys = [publicKeyOne, publicKeyTwo]
-    const schnorrkel = new Schnorrkel()
-    const privateKey =  new Key(Buffer.from(ethers.utils.arrayify(getEOAPrivateKey())))
+    const msg = abiCoder.encode(
+      ["address", "uint", "uint", "tuple(address, uint, bytes)[]"],
+      [data.multisigAddr, 31337, 0, txns]
+    );
+    const publicKeyOne = new Key(
+      Buffer.from(ethers.utils.arrayify(getEOAPublicKey()))
+    );
+    const publicKeyTwo = new Key(
+      Buffer.from(ethers.utils.arrayify(data.multisigPartnerPublicKey))
+    );
+    const publicKeys = [publicKeyOne, publicKeyTwo];
+    const schnorrkel = new Schnorrkel();
+    const privateKey = new Key(
+      Buffer.from(ethers.utils.arrayify(getEOAPrivateKey()))
+    );
     const partnerNonces = {
       kPublic: Key.fromHex(data.multisigPartnerKPublicHex),
-      kTwoPublic: Key.fromHex(data.multisigPartnerKTwoPublicHex)
-    }
-    const publicNonces = schnorrkel.generatePublicNonces(privateKey)
-    const combinedPublicNonces = [publicNonces, partnerNonces]
-    const hashFn = ethers.utils.keccak256
-    const {signature} = schnorrkel.multiSigSign(privateKey, msg, publicKeys, combinedPublicNonces, hashFn)
-    const sigHex = ethers.utils.hexlify(signature.buffer)
+      kTwoPublic: Key.fromHex(data.multisigPartnerKTwoPublicHex),
+    };
+    const publicNonces = schnorrkel.generatePublicNonces(privateKey);
+    const combinedPublicNonces = [publicNonces, partnerNonces];
+    const hashFn = ethers.utils.keccak256;
+    const { signature } = schnorrkel.multiSigSign(
+      privateKey,
+      msg,
+      publicKeys,
+      combinedPublicNonces,
+      hashFn
+    );
+    const sigHex = ethers.utils.hexlify(signature.buffer);
 
     const kPublicHex = publicNonces.kPublic.toHex();
     const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
     // const qrCode = getEOAPublicKey() + "|" + kPublicHex + "|" + kTwoPublicHex + "|" + sigHex + "|" + values.to + "|" + values.value.toString()
-    const qrCode = getEOAPublicKey() + "|" + kPublicHex + "|" + kTwoPublicHex + "|" + sigHex + "|" + msg
-    setQrCodeValue(qrCode)
-    onQrOpen()
-    return new Promise((resolve) => resolve(true))
+    const qrCode =
+      getEOAPublicKey() +
+      "|" +
+      kPublicHex +
+      "|" +
+      kTwoPublicHex +
+      "|" +
+      sigHex +
+      "|" +
+      msg;
+    setQrCodeValue(qrCode);
+    onQrOpen();
+    return new Promise((resolve) => resolve(true));
   };
 
   return (
@@ -72,7 +104,7 @@ const CreateTransaction = (props: any) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent style={{ padding: 20 }}>
-          <h2>Create Transaction</h2>
+          <h2 style={{ marginBottom: 20 }}>Create Transaction</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl>
               <FormLabel htmlFor="to">To:</FormLabel>
@@ -80,6 +112,7 @@ const CreateTransaction = (props: any) => {
                 id="to"
                 type="text"
                 placeholder="0x..."
+                mb={4}
                 {...register("to", {
                   required: "This is required",
                 })}
@@ -92,6 +125,7 @@ const CreateTransaction = (props: any) => {
                 placeholder="0.00"
                 type="number"
                 step="0.000000001"
+                mb={4}
                 {...register("value", {
                   required: "This is required",
                   valueAsNumber: true,
@@ -113,7 +147,7 @@ const CreateTransaction = (props: any) => {
       <Modal isOpen={isQrOpen} onClose={onQrClose}>
         <ModalOverlay />
         <ModalContent>
-          <QRCode value={qrCodeValue} style={{ padding: 20 }} />
+          <QRCode size={380} value={qrCodeValue} style={{ padding: 20 }} />
         </ModalContent>
       </Modal>
     </>
