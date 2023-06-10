@@ -9,7 +9,7 @@ const Accounts = () => {
   const { multisigData } = useContext(MultisigContext)
   return (
     <Flex flexDirection={"column"} mb={3}>
-      <Heading textAlign={"center"} color={"teal.500"} fontSize={"xl"}>My Addresses</Heading>
+      <Heading textAlign={"center"} color={"teal.500"} mb={3} fontSize={"xl"}>My Addresses</Heading>
       <Flex justifyContent={"space-between"} gap={"2"}>
         <AccountAddress address={address} addressType="Externaly Owned Account (EOA)" onCreate={createAndStoreEOAIfNeeded} />
         <AccountAddress address={multisigData.multisigAddr} addressType="Multisig (Smart Account)" />
