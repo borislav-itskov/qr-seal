@@ -34,3 +34,11 @@ export const getEOAPublicKey = () => {
 
   return publicKey;
 };
+
+export const getEOAAddress = () => {
+  const publicKey = getEOAPublicKey();
+  if (!publicKey) return "";
+
+  // Compute the Ethereum address from the public key
+  return utils.computeAddress(publicKey);
+};

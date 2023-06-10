@@ -1,13 +1,27 @@
-import { getEOAPublicKey } from "../services/eoa";
+import React from "react";
+import { Box, Text, Flex, useColorModeValue } from "@chakra-ui/react";
+import Blockies from "react-blockies";
+import { getEOAAddress } from "../services/eoa";
 
 const EOAAccount = () => {
-  const publicKey = getEOAPublicKey();
+  const address = getEOAAddress();
 
   return (
-    <p style={{ fontSize: 16 }}>
-      EAO account public address:{" "}
-      <small style={{ fontSize: 14 }}>{publicKey}</small>
-    </p>
+    <Box maxW={"500px"} w={"full"} boxShadow={"2xl"} rounded={"lg"} p={6}>
+      <Flex>
+        <Box mr={4} rounded="lg">
+          <Blockies seed={address} size={15} scale={4} className="identicon" />
+        </Box>
+        <Box>
+          <Text fontSize={"lg"} textAlign="left" fontWeight={500} mb={2}>
+            EOA Account Address
+          </Text>
+          <Text fontSize={"md"} textAlign="left" fontWeight={400}>
+            {address}
+          </Text>
+        </Box>
+      </Flex>
+    </Box>
   );
 };
 
