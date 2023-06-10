@@ -2,7 +2,6 @@
 pragma solidity 0.8.19;
 
 import './libs/SignatureValidator.sol';
-import 'hardhat/console.sol';
 
 // @dev All external/public functions (that are not view/pure) use `payable` because AmbireAccount
 // is a wallet contract, and any ETH sent to it is not lost, but on the other hand not having `payable`
@@ -128,7 +127,6 @@ contract AmbireAccount {
 	// that is authorized to execute on this account (in `privileges`)
 	// @dev: WARNING: if the signature of this is changed, we have to change AmbireAccountFactory
 	function execute(Transaction[] calldata txns, bytes calldata signature) public payable {
-		console.log(1);
 
 		uint256 currentNonce = nonce;
 		// NOTE: abi.encode is safer than abi.encodePacked in terms of collision safety

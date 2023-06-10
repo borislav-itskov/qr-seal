@@ -2,7 +2,6 @@
 pragma solidity 0.8.19;
 
 import './AmbireAccount.sol';
-import 'hardhat/console.sol';
 
 contract AmbireAccountFactory {
 	event LogDeployed(address addr, uint256 salt);
@@ -28,7 +27,6 @@ contract AmbireAccountFactory {
 		AmbireAccount.Transaction[] calldata txns,
 		bytes calldata signature
 	) external {
-		console.log(999999);
 		address payable addr = payable(deploySafe(code, salt));
 		AmbireAccount(addr).execute(txns, signature);
 	}

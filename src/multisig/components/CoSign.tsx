@@ -145,8 +145,6 @@ const CoSign = (props: any) => {
     };
     const schnorrkel = getSchnorrkelInstance()
     const publicNonces = schnorrkel.getPublicNonces(privateKey)
-    // console.log(publicNonces.kPublic.toHex())
-    // console.log(publicNonces.kTwoPublic.toHex())
     const combinedPublicNonces = [publicNonces, partnerNonces];
     const hashFn = ethers.utils.keccak256;
     const { signature, challenge, finalPublicNonce } = schnorrkel.multiSigSign(
@@ -178,11 +176,9 @@ const CoSign = (props: any) => {
     )
     const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
     // const deployment = await factory.deploy(data.bytecode, 0)
-    console.log(data.bytecode)
-    console.log(txns)
-    console.log(ambireSig)
-    const deployment = await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig)
-    console.log(deployment)
+    await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig)
+
+    // TO DO: get transaction hash and display a link to a scanner
   }
 
   return (

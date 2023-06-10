@@ -19,7 +19,7 @@ const AMBIRE_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 const localhost = 'http://127.0.0.1:8545'
 const mainProvider = new ethers.providers.JsonRpcProvider(localhost)
 
-async function doShit() {
+async function deployAndExecute() {
     const pkWithETH = '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
     const otherSigner = new ethers.Wallet(pkWithETH, mainProvider)
     const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, otherSigner)
@@ -69,4 +69,4 @@ async function doShit() {
     console.log(alabala)
 }
 
-doShit()
+deployAndExecute()
