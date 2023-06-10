@@ -1,6 +1,6 @@
 import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
-import { ethers, utils } from "ethers";
-import { useMemo, useState } from "react";
+import { ethers } from "ethers";
+import { useContext, useState } from "react";
 import QRCode from "react-qr-code";
 import { getEOAPrivateKey, getEOAPublicKey } from "../../auth/services/eoa";
 import { useForm } from "react-hook-form";
@@ -9,13 +9,12 @@ import {
   ModalContent,
   ModalOverlay,
   useDisclosure,
-  FormErrorMessage,
   FormLabel,
   FormControl,
   Input,
   Button,
 } from "@chakra-ui/react";
-import { getAllMultisigData } from "../../auth/services/multisig";
+import MultisigContext from "../../auth/context/multisig";
 
 interface FormProps {
   to: string;
@@ -23,6 +22,8 @@ interface FormProps {
 }
 
 const CreateTransaction = (props: any) => {
+  const { getAllMultisigData } = useContext(MultisigContext)
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isQrOpen, onOpen: onQrOpen, onClose: onQrClose } = useDisclosure();
   const [qrCodeValue, setQrCodeValue] = useState("");
@@ -34,6 +35,7 @@ const CreateTransaction = (props: any) => {
 
   const onSubmit = (values: FormProps) => {
     const data = getAllMultisigData()
+    if (!data) return
     const abiCoder = new ethers.utils.AbiCoder()
     const sendTosignerTxn = [values.to, ethers.utils.parseEther(values.value.toString()), '0x00']
     const txns = [sendTosignerTxn]

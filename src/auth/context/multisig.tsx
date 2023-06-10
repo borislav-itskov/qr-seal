@@ -1,28 +1,52 @@
-import { createContext, useState, useMemo, useEffect } from "react";
-import { getAllMultisigData, createAndStoreMultisigDataIfNeeded, MultisigData as MultisigDataType } from "../services/multisig";
+import { createContext, useState, useMemo, useCallback } from "react";
+
+const STORAGE_KEY_MULTISIG = "multisig-data";
+
+export interface MultisigData {
+  multisigPartnerPublicKey: string;
+  multisigPartnerKPublicHex: string;
+  multisigPartnerKTwoPublicHex: string;
+  multisigAddr: string
+}
+
+export const getMultisigData = () =>
+  localStorage.getItem(STORAGE_KEY_MULTISIG) || "";
+
+export const createAndStoreMultisigDataInLocalStorageIfNeeded = (multisigData: MultisigData) => {
+  const storedMultisigData = getMultisigData();
+  if (storedMultisigData) return;
+  // Store the private key hex string in local storage
+  localStorage.setItem(STORAGE_KEY_MULTISIG, JSON.stringify(multisigData));
+};
+
+export const getMultisigDataFromLocalStorage = () => {
+  const multisigData = getMultisigData();
+  if (!multisigData) return "";
+
+  return JSON.parse(multisigData)
+};
 
 
 const MultisigContext = createContext({
-  multisigData: {},
-  createAndStoreMultisigDataIfNeeded: (multisigData: MultisigDataType) => {},
-  getAllMultisigData: () => {},
+  multisigData: getMultisigDataFromLocalStorage(),
+  createAndStoreMultisigDataIfNeeded: (multisigData: MultisigData) => {}, 
+  getAllMultisigData: () => getMultisigDataFromLocalStorage(),
 });
 
 export const MultisigProvider = ({ children }: any) => {
-  const [multisigData, setMultisigData] = useState({});
+  const [multisigData, setMultisigData] = useState(getMultisigDataFromLocalStorage());
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const updatedMultisigData = getAllMultisigData();
-      setMultisigData(updatedMultisigData);
-    };
+  const getAllMultisigData = useCallback(() => {
+    if (!multisigData) {
+      return getMultisigDataFromLocalStorage()
+    }
+    else return multisigData
+  }, [multisigData])
 
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  const createAndStoreMultisigDataIfNeeded = (multisigData: MultisigData) => {
+    createAndStoreMultisigDataInLocalStorageIfNeeded(multisigData)
+    setMultisigData(multisigData)
+  }
 
   return (
     <MultisigContext.Provider
@@ -30,7 +54,7 @@ export const MultisigProvider = ({ children }: any) => {
         multisigData,
         createAndStoreMultisigDataIfNeeded,
         getAllMultisigData,
-    }), [multisigData])}
+    }), [multisigData, getAllMultisigData])}
     >
       {children}
     </MultisigContext.Provider>
