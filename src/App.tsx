@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import logo from "./qr-seal-logo-transparent.png";
 import "./App.css";
-import { Flex, Text, Box, Heading } from "@chakra-ui/react"
+import { Flex, Box, Heading } from "@chakra-ui/react"
 import MultisigContext from "./auth/context/multisig";
 import {
   Step,
@@ -43,7 +43,7 @@ function App() {
     if (address && multisigData) {
       setActiveStep(2)
     }
-  }, [setActiveStep, address, multisigData]);
+  }, [activeStep, setActiveStep, address, multisigData]);
 
   return (
   <Flex color={"white"} justifyContent={"center"} minHeight={"100vh"} backgroundColor="blue.100">
@@ -76,13 +76,15 @@ function App() {
               <InstallPWA />
               <Accounts />
               <Flex flexDirection={"column"}>
-                <CreateMultisigByScanning />
-                <JoinMultisig />
+                <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
+                  <CreateMultisigByScanning />
+                  <JoinMultisig />
+                </Flex>
 
-                {activeStep === 2 && <>
+                {activeStep === 2 && <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
                   <CreateTransaction />
                   <CoSign />
-                </>}
+                </Flex>}
 
               </Flex>
           </Flex>
