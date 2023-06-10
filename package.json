@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@borislav.itskov/schnorrkel.js": "^2.0.5",
+    "@borislav.itskov/schnorrkel.js": "^2.0.7",
     "@chakra-ui/react": "^2.7.0",
     "@craco/craco": "^7.1.0",
     "@emotion/react": "^11.11.1",
