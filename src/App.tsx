@@ -14,7 +14,10 @@ import {
   Stepper,
   useSteps,
   Text,
-  Link
+  Link,
+  useColorModeValue,
+  Stack,
+  Container
 } from "@chakra-ui/react";
 
 import Accounts from "./common/accounts";
@@ -136,16 +139,31 @@ function App() {
           </Flex>
         </Flex>
       </Flex>
-      <Flex justifyContent="center" position="sticky" bottom="0" px={5} py={4} borderTop={'1px solid'} borderColor={"teal.900"}>
-        <Text color="teal.900" fontWeight="light" >
-          Built at{" "}
-          <Link href="https://ethprague.com/" transition="all 0.4s"  _hover={{ opacity: 0.6 }} textDecoration="underline" target="_blank" rel="noreferrer">
-            ETH Prague 2023
-          </Link>
-          {" "}with lots of ❤️ by Gery, Kalo and Bobby.{" "}<Link transition="all 0.4s" _hover={{ opacity: 0.6 }} href="https://github.com/borislav-itskov/qr-seal" textDecoration="underline" target="_blank" rel="noreferrer">
-          Github link.</Link>
-        </Text>
-      </Flex>
+
+      <Box
+        bg="blue.50"
+        color={useColorModeValue('blue.700', 'blue.200')}>
+        <Box
+          borderTopWidth={1}
+          borderStyle={'solid'}
+          borderColor={useColorModeValue('blue.200', 'blue.700')}>
+          <Container
+            as={Stack}
+            maxW={'6xl'}
+            py={4}
+            direction={{ base: 'column', md: 'row' }}
+            spacing={4}
+            justify={{ base: 'center', md: 'center' }}
+            align={{ base: 'center', md: 'center' }}>
+            <Text textAlign="center">Build at the <Link href="https://ethprague.com" fontWeight="600" transition="all 0.4s" _hover={{ opacity: 0.6 }} target="_blank">
+            ETHPrague hackathon 2023 🇨🇿
+          </Link> | Made with ❤️ by team <Link fontWeight="600" transition="all 0.4s" _hover={{ opacity: 0.6 }} href="https://devfolio.co/projects/qr-seal-7871" target="_blank">GoodMorning</Link> | <Link fontWeight="600" transition="all 0.4s" _hover={{ opacity: 0.6 }} href="https://github.com/borislav-itskov/qr-seal" target="_blank">
+          Open Source</Link></Text>
+            <Stack direction={'row'} spacing={6}>
+            </Stack>
+          </Container>
+        </Box>
+      </Box>
     </Flex>
   );
 }
