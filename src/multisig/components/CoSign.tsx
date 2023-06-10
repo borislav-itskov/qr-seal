@@ -9,7 +9,7 @@ import {
     useDisclosure,
   } from "@chakra-ui/react";
 import QRCodeScanner from "../../common/QRCodeScanner";
-import { useState, createContext } from "react";
+import { useState, createContext, useContext } from "react";
 import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
 import { getAmbireAccountAddress } from "../../utils/helpers";
 import buildinfo from "../../builds/FactoryAndAccountBuild.json";
@@ -30,7 +30,7 @@ interface FormProps {
 }
 
 const CoSign = (props: any) => {
-  const { createAndStoreMultisigDataIfNeeded } = createContext(MultisigContext)
+  const { createAndStoreMultisigDataIfNeeded } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isFormOpen, onOpen: onFormOpen, onClose: onFormClose } = useDisclosure();
   const [ to, setTo ] = useState("");
