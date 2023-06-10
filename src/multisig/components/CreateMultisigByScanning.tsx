@@ -110,7 +110,7 @@ const CreateMultisigByScanning = (props: any) => {
   return (
     <>
       <Button onClick={onOpen}>Create Multisig</Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
           <QRCodeScanner
