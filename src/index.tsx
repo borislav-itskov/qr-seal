@@ -11,10 +11,11 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 // TODO: Optimize those by importing only the weights we need
 import '@fontsource-variable/roboto-slab';
 import '@fontsource-variable/open-sans';
+import { EOAProvider } from "./auth/context/eoa";
 
 // TODO: Init EOA account creation when page is loaded. Ideally, it should
 // prompt the user to create EOA or something.
-createAndStoreEOAIfNeeded();
+// createAndStoreEOAIfNeeded();
 
 const theme = extendTheme({
   fonts: {
@@ -29,9 +30,11 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <ChakraProvider theme={theme}>
-    <MultisigProvider>
-      <App />
-    </MultisigProvider>
+    <EOAProvider>
+      <MultisigProvider>
+        <App />
+      </MultisigProvider>
+    </EOAProvider>
   </ChakraProvider>
   // </React.StrictMode>
 );

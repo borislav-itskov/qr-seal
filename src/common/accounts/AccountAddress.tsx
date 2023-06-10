@@ -2,8 +2,7 @@ import React from "react";
 import { Box, Text, Flex, Button } from "@chakra-ui/react";
 import Blockies from "react-blockies";
 
-const AccountAddress = ({ address, addressType }: any) => {
-  console.log(address, addressType)
+const AccountAddress = ({ address, addressType, createAndStoreEOA }: any) => {
   return (
     <Box flex={1} maxW={"300px"} boxShadow={"2xl"} rounded={"lg"} p={6}>
       {address ? (
@@ -22,7 +21,7 @@ const AccountAddress = ({ address, addressType }: any) => {
           </Text>
         </Box>
       </Flex>
-      ) : <Button>Generate</Button>}
+      ) : <Button onClick={createAndStoreEOA}>Generate</Button>}
  
     </Box>
   );

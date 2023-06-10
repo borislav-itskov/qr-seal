@@ -78,7 +78,7 @@ function App() {
               <Flex flexDirection={"column"}>
                 <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
                   <CreateMultisigByScanning />
-                  <JoinMultisig />
+                  {address && <JoinMultisig />}
                 </Flex>
 
                 {activeStep === 2 && <Flex alignItems={"center"} justifyContent={"center"} gap={2}>

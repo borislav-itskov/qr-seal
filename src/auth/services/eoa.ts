@@ -21,7 +21,7 @@ export const createAndStoreEOAIfNeeded = () => {
 
 export const getEOAPublicKey = () => {
   const privateKeyHex = getEOAPrivateKey();
-  if (!privateKeyHex) throw new Error("No EOA private key found");
+  if (!privateKeyHex) return '';
 
   // Convert hex string back to bytes
   const privateKeyBytes = utils.arrayify(privateKeyHex);
