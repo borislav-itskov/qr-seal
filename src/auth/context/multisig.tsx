@@ -1,3 +1,4 @@
+import { Key } from "@borislav.itskov/schnorrkel.js";
 import { createContext, useState, useMemo, useCallback } from "react";
 
 const STORAGE_KEY_MULTISIG = "multisig-data";
@@ -6,7 +7,10 @@ export interface MultisigData {
   multisigPartnerPublicKey: string;
   multisigPartnerKPublicHex: string;
   multisigPartnerKTwoPublicHex: string;
-  multisigAddr: string
+  multisigAddr: string;
+  multisigPartnerSignature?: string;
+  combinedPublicKey?: Key;
+  bytecode?: string;
 }
 
 export const getMultisigData = () =>
