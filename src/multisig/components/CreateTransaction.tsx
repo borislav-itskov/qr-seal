@@ -145,7 +145,7 @@ const CreateTransaction = (props: any) => {
       <Modal isOpen={isQrOpen} onClose={onQrClose}>
         <ModalOverlay />
         <ModalContent>
-          <QRCode size={450} value={qrCodeValue} style={{ padding: 20 }} />
+          <QRCode size={380} value={qrCodeValue} style={{ padding: 20 }} />
         </ModalContent>
       </Modal>
     </>
