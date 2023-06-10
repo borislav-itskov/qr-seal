@@ -1,8 +1,14 @@
-# Light Schnorr Multisig, ETH Prague 2023 Hackathon
+# QR Seal: Multisig Wallet 🦭
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+QR Seal is a privacy-preserving, gas-optimized mobile multisig wallet, implemented via account abstraction, ERC-4337 and Schnorr signatures. Read the full description [here](https://devfolio.co/projects/qr-seal-7871).
+
+A hack for the [ETH Prague 2023 Hackathon](https://ethprague.com/)!
+
+![ETH Prague logo](https://pbs.twimg.com/profile_images/1633826299495034880/zXuo99FD_400x400.jpg)
 
 ## Available Scripts
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 In the project directory, you can run:
 
