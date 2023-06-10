@@ -5,7 +5,7 @@ import Blockies from "react-blockies";
 const AccountAddress = ({ address, addressType }: any) => {
   console.log(address, addressType)
   return (
-    <Box flex={1} maxW={"300px"} boxShadow={"2xl"} rounded={"lg"} p={6}>
+    <Box flex={1} maxW={["100%","300px"]} boxShadow={"2xl"} rounded={"lg"} p={6}>
       {address ? (
         <Flex flexDirection={"column"}>
         <Flex alignItems={"center"} mb={1}>
