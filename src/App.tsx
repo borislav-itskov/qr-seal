@@ -114,7 +114,7 @@ function App() {
 
                 <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
                   {activeStep === 2 && <CreateTransaction />}
-                  {activeStep === 1 && <CoSign />}
+                  {activeStep >= 1 && <CoSign />}
                 </Flex>
               </Flex>
             </Flex>

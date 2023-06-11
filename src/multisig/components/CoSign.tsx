@@ -8,6 +8,13 @@ import {
     Input,
     useDisclosure,
     useToast,
+    Alert,
+    AlertIcon,
+    Box,
+    AlertTitle,
+    AlertDescription,
+    Text,
+    Flex,
   } from "@chakra-ui/react";
 import QRCodeScanner from "../../common/QRCodeScanner";
 import { useState, createContext, useContext } from "react";
@@ -40,6 +47,7 @@ const CoSign = (props: any) => {
   const { createAndStoreMultisigDataIfNeeded, getAllMultisigData } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isFormOpen, onOpen: onFormOpen, onClose: onFormClose } = useDisclosure();
+  const [transaction, setTransaction] = useState<any>(null)
 
   const {
     handleSubmit,
@@ -197,12 +205,36 @@ const CoSign = (props: any) => {
       isClosable: true,
     })
     setActiveStep(3)
-    // TO DO: show txn hash in polygon scan
+
+    setTransaction(transactionHash)
+  }
+
+  const openInExplorer = () => {
+    if (!transaction) return;
+
+    const polygonScanUrl = `https://polygonscan.com/tx/${transaction?.hash}`;
+    window.open(polygonScanUrl, '_blank');
   }
 
   return (
     <>
+      <Flex width={"100%"} flexDirection={"column"}>
       <Button onClick={onOpen} flex={1} _hover={{ bg: 'transparent', color: "teal.400", borderColor: "teal.400" }} background={"teal.400"} borderWidth={3} borderColor={"teal.400"} color={"white"}>Co-Sign</Button>
+      {transaction && (
+        <Alert status="success" mt={4} mb={8} colorScheme="teal">
+          <AlertIcon />
+          <Box flex="1">
+            <AlertTitle color="teal.900">Transaction Sent! Hash:</AlertTitle>
+            <AlertDescription display="flex" alignItems="center" flexDirection="column">
+              <Text mr={2} color="teal.900" wordBreak="break-word">{transaction.hash}</Text>
+              <Button size="sm" onClick={openInExplorer}>
+                View on PolygonScan
+              </Button>
+            </AlertDescription>
+          </Box>
+        </Alert>
+      )}
+      </Flex>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
