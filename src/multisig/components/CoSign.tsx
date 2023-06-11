@@ -218,8 +218,8 @@ const CoSign = (props: any) => {
 
   return (
     <>
-      <Flex width={"100%"} flexDirection={"column"}>
-      <Button onClick={onOpen} flex={1} _hover={{ bg: 'transparent', color: "teal.400", borderColor: "teal.400" }} background={"teal.400"} borderWidth={3} borderColor={"teal.400"} color={"white"}>Co-Sign</Button>
+      <Flex flex={"1"} height="100%" flexDirection={"column"}>
+      <Button onClick={onOpen} flex={1} my={4} _hover={{ bg: 'transparent', color: "teal.400", borderColor: "teal.400" }} background={"teal.400"} py={2} borderWidth={3} borderColor={"teal.400"} color={"white"}>Co-Sign</Button>
       {transaction && (
         <Alert status="success" mt={4} mb={8} colorScheme="teal">
           <AlertIcon />
