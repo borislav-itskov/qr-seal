@@ -41,10 +41,11 @@ function App() {
       backgroundColor="blue.100"
       flexDirection={"column"}
       justifyContent={"space-between"}
-      px={2}
     >
       <Flex
+        px={2}
         justifyContent={"center"}
+        mb={3}
       >
         <Flex flex="1" maxWidth={600} flexDirection={"column"}>
           <Flex
@@ -105,7 +106,7 @@ function App() {
                 </Step>
               ))}
             </Stepper>
-            <Flex flexDirection={"column"} flex={1}>
+            <Flex flexDirection={"column"} flex={1} px={isMobile ? 2 : 0}>
               {/* TODO: Figure out on a later step if we should leave this installation button */}
               {/* <InstallPWA /> */}
               <Accounts />
