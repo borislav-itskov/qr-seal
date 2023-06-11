@@ -8,6 +8,13 @@ import {
     Input,
     useDisclosure,
     useToast,
+    Alert,
+    AlertIcon,
+    Box,
+    AlertTitle,
+    AlertDescription,
+    Text,
+    Flex,
   } from "@chakra-ui/react";
 import QRCodeScanner from "../../common/QRCodeScanner";
 import { useState, createContext, useContext } from "react";
@@ -40,6 +47,7 @@ const CoSign = (props: any) => {
   const { createAndStoreMultisigDataIfNeeded, getAllMultisigData } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isFormOpen, onOpen: onFormOpen, onClose: onFormClose } = useDisclosure();
+  const [transaction, setTransaction] = useState<any>(null)
 
   const {
     handleSubmit,
@@ -121,6 +129,7 @@ const CoSign = (props: any) => {
     const data = getAllMultisigData();
     if (!data) return
 
+    const { chainId } = await mainProvider.getNetwork()
     const abiCoder = new ethers.utils.AbiCoder();
     const sendTosignerTxn = [
       values.to,
@@ -132,7 +141,7 @@ const CoSign = (props: any) => {
     // change it to read from the contract if any
     const msg = abiCoder.encode(
       ["address", "uint", "uint", "tuple(address, uint, bytes)[]"],
-      [data.multisigAddr, 31337, 0, txns]
+      [data.multisigAddr, chainId, 0, txns]
     );
     const publicKeyOne = new Key(
       Buffer.from(ethers.utils.arrayify(eoaPublicKey))
@@ -180,8 +189,12 @@ const CoSign = (props: any) => {
       mainProvider
     )
     const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
-    // const deployment = await factory.deploy(data.bytecode, 0)
-    await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig)
+    const feeData = await mainProvider.getFeeData()
+    const transactionHash = await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig, {
+      gasPrice: feeData.gasPrice?.toString(),
+      gasLimit: ethers.BigNumber.from(ethers.utils.hexlify(250000))
+    })
+    console.log(transactionHash)
 
     onFormClose()
     toast({
@@ -193,12 +206,35 @@ const CoSign = (props: any) => {
     })
     setActiveStep(3)
 
-    // TO DO: get transaction hash and display a link to a scanner
+    setTransaction(transactionHash)
+  }
+
+  const openInExplorer = () => {
+    if (!transaction) return;
+
+    const polygonScanUrl = `https://polygonscan.com/tx/${transaction?.hash}`;
+    window.open(polygonScanUrl, '_blank');
   }
 
   return (
     <>
+      <Flex width={"100%"} flexDirection={"column"}>
       <Button onClick={onOpen} flex={1} _hover={{ bg: 'transparent', color: "teal.400", borderColor: "teal.400" }} background={"teal.400"} borderWidth={3} borderColor={"teal.400"} color={"white"}>Co-Sign</Button>
+      {transaction && (
+        <Alert status="success" mt={4} mb={8} colorScheme="teal">
+          <AlertIcon />
+          <Box flex="1">
+            <AlertTitle color="teal.900">Transaction Sent! Hash:</AlertTitle>
+            <AlertDescription display="flex" alignItems="center" flexDirection="column">
+              <Text mr={2} color="teal.900" wordBreak="break-word">{transaction.hash}</Text>
+              <Button size="sm" onClick={openInExplorer}>
+                View on PolygonScan
+              </Button>
+            </AlertDescription>
+          </Box>
+        </Alert>
+      )}
+      </Flex>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

@@ -16,6 +16,7 @@ import {
 import MultisigContext from "../../auth/context/multisig";
 import getSchnorrkelInstance from "../../singletons/Schnorr";
 import { useEOA } from "../../auth/context/eoa";
+import { mainProvider } from "../../config/constants";
 
 interface FormProps {
   to: string;
@@ -39,9 +40,11 @@ const CreateTransaction = (props: any) => {
     formState: { isSubmitting },
   } = useForm<FormProps>();
 
-  const onSubmit = (values: FormProps) => {
+  const onSubmit = async (values: FormProps) => {
     const data = getAllMultisigData();
     if (!data) return
+    
+    const { chainId } = await mainProvider.getNetwork()
     const abiCoder = new ethers.utils.AbiCoder();
     const sendTosignerTxn = [
       values.to,
@@ -53,7 +56,7 @@ const CreateTransaction = (props: any) => {
     // change it to read from the contract if any
     const msg = abiCoder.encode(
       ["address", "uint", "uint", "tuple(address, uint, bytes)[]"],
-      [data.multisigAddr, 31337, 0, txns]
+      [data.multisigAddr, chainId, 0, txns]
     );
     const publicKeyOne = new Key(
       Buffer.from(ethers.utils.arrayify(eoaPublicKey))

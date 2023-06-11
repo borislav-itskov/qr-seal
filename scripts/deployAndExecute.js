@@ -14,8 +14,8 @@ function wrapSchnorr(sig) {
   return `${sig}${'04'}`
 }
 
-const FACTORY_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-const AMBIRE_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const FACTORY_ADDRESS = "0x1bb0684486c35e35D56FaA806e12f6819dbe9527";
+const AMBIRE_ADDRESS = "0x1100E4Cf3fe64b928cccE36c78ad6b7696d72446";
 const localhost = 'http://127.0.0.1:8545'
 const mainProvider = new ethers.providers.JsonRpcProvider(localhost)
 
