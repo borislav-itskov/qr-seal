@@ -4,9 +4,9 @@ const { AmbireAccountFactory, AmbireAccount } = require("../test/config")
 const polygon = 'https://polygon-rpc.com'
 const provider = new ethers.providers.JsonRpcProvider(polygon)
 
-async function generateFactoryDeploy (gasPrice) {
+async function generateFactoryDeploy (gasPrice) {4
 	const txn = {}
-  	const hardhatPk = '0x36bb7dc89963a2d4e0031106ce42d5e516a098fbccae21ee281cbd2d6a44abf9'
+  	const hardhatPk = ''
 	const fundWallet = new ethers.Wallet(hardhatPk, provider)
 	const factory = new ethers.ContractFactory(AmbireAccountFactory.abi, AmbireAccountFactory.bytecode, fundWallet)
 
@@ -24,7 +24,7 @@ async function generateFactoryDeploy (gasPrice) {
 
 async function generateAmbireDeploy (gasPrice) {
 	const txn = {}
-  const hardhatPk = '0x36bb7dc89963a2d4e0031106ce42d5e516a098fbccae21ee281cbd2d6a44abf9'
+  	const hardhatPk = ''
 	const fundWallet = new ethers.Wallet(hardhatPk, provider)
 	const factory = new ethers.ContractFactory(AmbireAccount.abi, AmbireAccount.bytecode, fundWallet)
 
@@ -44,8 +44,7 @@ async function deploy() {
 
   const feeData = await provider.getFeeData()
   const sig = await generateAmbireDeploy(feeData.gasPrice)
-//   console.log(ethers.utils.parseUnits(feeData.gasPrice.toString(), 'gwei'))
-  console.log(feeData.gasPrice.toString())
+  console.log(sig)
 
   // const contractFactoryAmbire = new ethers.ContractFactory(AmbireAccount.abi, AmbireAccount.bytecode, fundWallet)
   // const ambireTxn = contractFactoryAmbire.getDeployTransaction({
