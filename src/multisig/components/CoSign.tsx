@@ -184,7 +184,7 @@ const CoSign = (props: any) => {
     console.log(feeData.gasPrice)
     const transactionHash = await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig, {
       gasPrice: feeData.gasPrice?.toString(),
-      gasLimit: ethers.BigNumber.from(ethers.utils.hexlify(100000000))
+      gasLimit: ethers.BigNumber.from(ethers.utils.hexlify(250000))
     })
 
     onFormClose()
