@@ -88,8 +88,8 @@ function App() {
                   <StepIndicator borderColor={step > activeStep ? "teal.500" : "teal.300"}>
                     <StepStatus
                       complete={`✅`}
-                      incomplete={`${index === 1 ? `🤿` : `✉️`}`}
-                      active={`${index === 1 ? `🤿` : `✉️`}`}
+                      incomplete={`${index === 1 ? `🤿` : (index === 0 ? `🐟` : `🔱`)}`}
+                      active={`${index === 1 ? `🤿` : (index === 0 ? `🐟` : `🔱`)}`}
                     />
                   </StepIndicator>
                   <Box flexShrink="0">
