@@ -121,6 +121,7 @@ const CoSign = (props: any) => {
     const data = getAllMultisigData();
     if (!data) return
 
+    const { chainId } = await mainProvider.getNetwork()
     const abiCoder = new ethers.utils.AbiCoder();
     const sendTosignerTxn = [
       values.to,
@@ -132,7 +133,7 @@ const CoSign = (props: any) => {
     // change it to read from the contract if any
     const msg = abiCoder.encode(
       ["address", "uint", "uint", "tuple(address, uint, bytes)[]"],
-      [data.multisigAddr, 31337, 0, txns]
+      [data.multisigAddr, chainId, 0, txns]
     );
     const publicKeyOne = new Key(
       Buffer.from(ethers.utils.arrayify(eoaPublicKey))
@@ -181,11 +182,11 @@ const CoSign = (props: any) => {
     )
     const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
     const feeData = await mainProvider.getFeeData()
-    console.log(feeData.gasPrice)
     const transactionHash = await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig, {
       gasPrice: feeData.gasPrice?.toString(),
       gasLimit: ethers.BigNumber.from(ethers.utils.hexlify(250000))
     })
+    console.log(transactionHash)
 
     onFormClose()
     toast({
