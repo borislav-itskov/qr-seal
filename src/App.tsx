@@ -41,6 +41,7 @@ function App() {
       backgroundColor="blue.100"
       flexDirection={"column"}
       justifyContent={"space-between"}
+      px={2}
     >
       <Flex
         justifyContent={"center"}
@@ -80,11 +81,12 @@ function App() {
               index={activeStep}
               colorScheme="teal"
               mb={3}
-              variant="withCustomIndicatorSize" size={isMobile ? "md" : "lg"} gap={isMobile? "1" : "2"}
+              variant="withCustomIndicatorSize"
+              size={isMobile ? "md" : "lg"}
+              gap={isMobile? "0" : "2"}
             >
               {steps.map((step, index) => (
                 <Step key={index}>
-                  {/* @ts-ignore */}
                   <StepIndicator borderColor={step > activeStep ? "teal.500" : "teal.300"}>
                     <StepStatus
                       complete={`✅`}
@@ -114,7 +116,7 @@ function App() {
 
                 <Flex alignItems={"center"} justifyContent={"center"} gap={2}>
                   {activeStep === 2 && <CreateTransaction />}
-                  {activeStep === 1 && <CoSign />}
+                  {activeStep >= 1 && <CoSign />}
                 </Flex>
               </Flex>
             </Flex>
