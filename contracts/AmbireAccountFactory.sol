@@ -57,6 +57,7 @@ contract AmbireAccountFactory {
 			assembly {
 				addr := create2(0, add(code, 0x20), mload(code), salt)
 			}
+			console.log(addr);
 			require(addr != address(0), 'FAILED_DEPLOYING');
 			require(addr == expectedAddr, 'FAILED_MATCH');
 			emit LogDeployed(addr, salt);

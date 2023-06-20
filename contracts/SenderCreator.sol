@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.19;
-
+pragma solidity ^0.8.12;
 import 'hardhat/console.sol';
 
 /**
@@ -8,6 +7,7 @@ import 'hardhat/console.sol';
  * which is explicitly not the entryPoint itself.
  */
 contract SenderCreator {
+
     /**
      * call the "initCode" factory to create and return the sender account address
      * @param initCode the initCode value from a UserOp. contains 20 bytes of factory address, followed by calldata
@@ -16,8 +16,6 @@ contract SenderCreator {
     function createSender(bytes calldata initCode) external returns (address sender) {
         address factory = address(bytes20(initCode[0 : 20]));
         bytes memory initCallData = initCode[20 :];
-        console.log(factory);
-
         bool success;
         /* solhint-disable no-inline-assembly */
         assembly {
@@ -25,7 +23,6 @@ contract SenderCreator {
             sender := mload(0)
         }
 
-        console.log(success);
         console.log(sender);
 
         if (!success) {

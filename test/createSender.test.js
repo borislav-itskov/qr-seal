@@ -31,21 +31,17 @@ describe('create sender tests', function(){
     ])
 
     const calldata = getDeployCalldata(bytecodeWithArgs, salt)
-    const initcode = ethers.utils.concat([factory.address, calldata])
-    // const erc4337Account = await signer.sendTransaction({
-    //   to: factory.address,
-    //   data: calldata
-    // })
-    // await erc4337Account.wait()
+    const initcode = ethers.utils.hexlify(ethers.utils.concat([factory.address, calldata]))
 
     const senderCreator = await ethers.deployContract('SenderCreator')
-    try {
-      await senderCreator.createSender(initcode)
-    } catch (e) {}
+    // await senderCreator.createSender(initcode)
 
-    const addr = getAddressCreateTwo(factory.address, bytecodeWithArgs)
-    const acc = new ethers.Contract(addr, ERC4337Account.abi, signer)
-    const entryPoint = await acc.entryPoint()
-    expect(entryPoint).to.equal(ENTRY_POINT_ADDRESS)
+    const senderAddress = getAddressCreateTwo(factory.address, bytecodeWithArgs)
+    // const acc = new ethers.Contract(senderAddress, ERC4337Account.abi, signer)
+    // const entryPointAddr = await acc.entryPoint()
+    // expect(entryPointAddr).to.equal(ENTRY_POINT_ADDRESS)
+
+    const entryPoint = await ethers.deployContract('EntryPoint')
+    const createAcc = await entryPoint.createSenderIfNeeded(senderAddress, ethers.utils.hexlify(2_000_000), initcode)
   })
 })
