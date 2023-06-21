@@ -30,6 +30,10 @@ contract ERC4337Account is AmbireAccount, IAccount {
 	{
 		require(msg.sender == entryPoint, "account: not from entrypoint");
 
+		// TO DO: we have some require statements in SignatureValidator.recoverAddr;
+		// if any of them hits, the txn gets reverted at our contracts;
+		// is this okay or should we wrap them in a try / catch and return
+		// validationData = SIG_VALIDATION_FAILED always?
         address signer = SignatureValidator.recoverAddr(userOpHash, userOp.signature);
 		if (privileges[signer] == bytes32(0)) {
 			validationData = SIG_VALIDATION_FAILED;

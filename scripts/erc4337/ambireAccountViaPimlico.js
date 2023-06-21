@@ -8,6 +8,10 @@ const { default: Schnorrkel, Key } = require('@borislav.itskov/schnorrkel.js')
 const ERC4337Account = require('../../artifacts/contracts/ERC4337Account.sol/ERC4337Account.json')
 const salt = '0x0'
 
+function wrapEthSign(sig) {
+  return `${sig}${'01'}`
+}
+
 function wrapSchnorr(sig) {
   return `${sig}${'04'}`
 }
@@ -140,8 +144,9 @@ const run = async () => {
 
   // SIGN THE USEROPERATION
   const signature = await owner.signMessage(ethers.utils.arrayify(await entryPoint.getUserOpHash(userOperation)))
+  const wrappedSig = wrapEthSign(signature)
 
-  userOperation.signature = signature
+  userOperation.signature = wrappedSig
 
   // SUBMIT THE USEROPERATION TO BE BUNDLED
   const userOperationHash = await pimlicoProvider.send("eth_sendUserOperation", [userOperation, ENTRY_POINT_ADDRESS])
