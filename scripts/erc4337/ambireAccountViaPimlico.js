@@ -20,6 +20,13 @@ function getAmbireAccountAddress(factoryAddress, bytecode) {
   return ethers.utils.getCreate2Address(factoryAddress, ethers.utils.hexZeroPad(salt, 32), ethers.utils.keccak256(bytecode))
 }
 
+function getSchnorrAddress(pk) {
+  const publicKey = ethers.utils.arrayify(ethers.utils.computePublicKey(ethers.utils.arrayify(pk), true))
+  const px = ethers.utils.hexlify(publicKey.slice(1, 33))
+  const hash = ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'bytes'], ['SCHNORR', px]))
+  return '0x' + hash.slice(hash.length - 40, hash.length)
+}
+
 function getDeployCalldata(bytecodeWithArgs, salt2) {
   const abi = ['function deploy(bytes calldata code, uint256 salt) external']
   const iface = new ethers.utils.Interface(abi)
@@ -39,35 +46,34 @@ function getExecuteCalldata(txns, signature) {
 }
 
 const run = async () => {
+  const someWallet = ethers.Wallet.createRandom()
+  const pk = someWallet.privateKey
   const AMBIRE_ACCOUNT_FACTORY_ADDR = "0x153E957A9ff1688BbA982856Acf178524aF96D78"
   const ENTRY_POINT_ADDRESS = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
   const provider = new StaticJsonRpcProvider(rpcs.mumbai)
-  const owner = new ethers.Wallet(process.env.DEPLOY_PRIVATE_KEY)
+  const entryPoint = EntryPoint__factory.connect(ENTRY_POINT_ADDRESS, provider)
+  const owner = new ethers.Wallet(pk, provider)
   const abicoder = new ethers.utils.AbiCoder()
+  const schnorrVirtualAddr = getSchnorrAddress(pk)
   const bytecodeWithArgs = ethers.utils.concat([
     ERC4337Account.bytecode,
-    abicoder.encode(['address', 'address[]'], [ENTRY_POINT_ADDRESS, [owner.address]])
+    abicoder.encode(['address', 'address[]'], [ENTRY_POINT_ADDRESS, [owner.address, schnorrVirtualAddr]])
   ])
-  const calldata = getDeployCalldata(bytecodeWithArgs, salt)
-  const initCode = ethers.utils.hexlify(ethers.utils.concat([AMBIRE_ACCOUNT_FACTORY_ADDR, calldata]))
 
-  const entryPoint = EntryPoint__factory.connect(ENTRY_POINT_ADDRESS, provider)
-  const senderAddress = await entryPoint.callStatic
-    .getSenderAddress(initCode)
-    .then(() => {
-      throw new Error("Expected getSenderAddress() to revert")
-    })
-    .catch((e) => {
-      const data = e.message.match(/0x6ca7b806([a-fA-F\d]*)/)?.[1]
-      if (!data) {
-        return Promise.reject(new Error("Failed to parse revert data"))
-      }
-      const addr = getAddress(`0x${data.slice(24, 64)}`)
-      return Promise.resolve(addr)
-    })
+  const senderAddress = getAmbireAccountAddress(AMBIRE_ACCOUNT_FACTORY_ADDR, bytecodeWithArgs)
+  const code = await provider.getCode(senderAddress)
+  const hasCode = code !== '0x'
+  const initCode = hasCode
+    ? '0x'
+    : ethers.utils.hexlify(ethers.utils.concat([
+        AMBIRE_ACCOUNT_FACTORY_ADDR,
+        getDeployCalldata(bytecodeWithArgs, salt)
+    ]))
+  const contract = new ethers.Contract(senderAddress, ERC4337Account.abi, owner)
+  const nonce = hasCode
+    ? (await contract.nonce()).toHexString()
+    : '0x00'
 
-  console.log(senderAddress)
-  
   // GENERATE THE CALLDATA
   const to = "0xCB8B547f2895475838195ee52310BD2422544408" // test metamask addr
   const value = 0
@@ -78,13 +84,11 @@ const run = async () => {
   // send money to the signer txn
   const singleTxn = [to, value, data]
   const txns = [singleTxn]
-  const msg = abicoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [senderAddress, chainIds.mumbai, 0, txns])
+  const msg = abicoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [senderAddress, chainIds.mumbai, nonce, txns])
   const hashFn = ethers.utils.keccak256
-  const schnorrPrivateKey = new Key(Buffer.from(ethers.utils.arrayify(`0x${process.env.DEPLOY_PRIVATE_KEY}`)))
+  const schnorrPrivateKey = new Key(Buffer.from(ethers.utils.arrayify(pk)))
   const schnorrSig = Schnorrkel.sign(schnorrPrivateKey, msg, hashFn)
-  const privateKeyBytes = ethers.utils.arrayify(`0x${process.env.DEPLOY_PRIVATE_KEY}`);
-  const uncompressedPublicKey = ethers.utils.computePublicKey(privateKeyBytes, false);
-  const publicKey = ethers.utils.computePublicKey(uncompressedPublicKey, true);
+  const publicKey = ethers.utils.arrayify(ethers.utils.computePublicKey(ethers.utils.arrayify(pk), true))
   const schnorrPublicKey = new Key(Buffer.from(ethers.utils.arrayify(publicKey)))
   const verification = Schnorrkel.verify(
     schnorrSig.signature,
@@ -112,7 +116,7 @@ const run = async () => {
 
   const userOperation = {
     sender: senderAddress,
-    nonce: ethers.utils.hexlify(0),
+    nonce,
     initCode,
     callData: executeCalldata,
     callGasLimit: ethers.utils.hexlify(100_000), // hardcode it for now at a high value

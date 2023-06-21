@@ -23,8 +23,6 @@ contract SenderCreator {
             sender := mload(0)
         }
 
-        console.log(sender);
-
         if (!success) {
             sender = address(0);
         }
