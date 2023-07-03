@@ -30,7 +30,7 @@ import MultisigContext from "../../auth/context/multisig";
 
 import { AMBIRE_ADDRESS, FACTORY_ADDRESS, mainProvider, deployGasLimit } from "../../config/constants";
 import { useForm } from "react-hook-form";
-import getSchnorrkelInstance from "../../singletons/Schnorr";
+import { getTxnSchnorrkelSigner } from "../../singletons/Schnorr";
 import AmbireAccountFactory from '../../builds/AmbireAccountFactory.json'
 import { useEOA } from "../../auth/context/eoa";
 import { useSteps } from "../../auth/context/step";
@@ -157,7 +157,7 @@ const CoSign = (props: any) => {
       kPublic: Key.fromHex(data.multisigPartnerKPublicHex),
       kTwoPublic: Key.fromHex(data.multisigPartnerKTwoPublicHex),
     };
-    const schnorrkel = getSchnorrkelInstance()
+    const schnorrkel = getTxnSchnorrkelSigner()
     const publicNonces = schnorrkel.getPublicNonces(privateKey)
     const combinedPublicNonces = [publicNonces, partnerNonces];
     const hashFn = ethers.utils.keccak256;

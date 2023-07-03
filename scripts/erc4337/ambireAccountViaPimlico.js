@@ -1,3 +1,8 @@
+/*
+1. Remove owner rights and sign with schnorr only
+2. We should sign the userOp with schnorr only.
+*/
+
 const { EntryPoint__factory } = require("@account-abstraction/contracts")
 const { StaticJsonRpcProvider } = require("@ethersproject/providers")
 const { ethers } = require("ethers")

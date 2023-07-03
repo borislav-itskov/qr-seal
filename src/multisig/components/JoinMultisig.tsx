@@ -9,7 +9,7 @@ import {
 import { utils } from "ethers";
 import { useMemo } from "react";
 import QRCode from "react-qr-code";
-import getSchnorrkelInstance from "../../singletons/Schnorr";
+import { getTxnSchnorrkelSigner, getUserOpSchnorrkelSigner } from "../../singletons/Schnorr";
 import { useEOA } from "../../auth/context/eoa";
 
 const JoinMultisig = (props: any) => {
@@ -17,17 +17,23 @@ const JoinMultisig = (props: any) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const qrCodeValue = useMemo(() => {
-    const schnorrkel = getSchnorrkelInstance();
+    const txnSchnorrkel = getTxnSchnorrkelSigner();
+    const userOpSchnorrkel = getUserOpSchnorrkelSigner();
 
     const privateKey = new Key(Buffer.from(utils.arrayify(eoaPrivateKey)))
-    const publicNonces = schnorrkel.hasNonces(privateKey)
-      ? schnorrkel.getPublicNonces(privateKey)
-      : schnorrkel.generatePublicNonces(privateKey);
+    const txnPublicNonces = txnSchnorrkel.hasNonces(privateKey)
+      ? txnSchnorrkel.getPublicNonces(privateKey)
+      : txnSchnorrkel.generatePublicNonces(privateKey);
+    const userOpPublicNonces = userOpSchnorrkel.hasNonces(privateKey)
+      ? userOpSchnorrkel.getPublicNonces(privateKey)
+      : userOpSchnorrkel.generatePublicNonces(privateKey);
 
-    const kPublicHex = publicNonces.kPublic.toHex();
-    const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
+    const txnPublicHex = txnPublicNonces.kPublic.toHex();
+    const txnTwoPublicHex = txnPublicNonces.kTwoPublic.toHex();
+    const userOpPublicHex = userOpPublicNonces.kPublic.toHex();
+    const userOpTwoPublicHex = userOpPublicNonces.kTwoPublic.toHex();
 
-    return eoaPublicKey + "|" + kPublicHex + "|" + kTwoPublicHex;
+    return eoaPublicKey + "|" + txnPublicHex + "|" + txnTwoPublicHex + "|" + userOpPublicHex + "|" + userOpTwoPublicHex;
   }, [eoaPrivateKey, eoaPublicKey]);
 
   return (

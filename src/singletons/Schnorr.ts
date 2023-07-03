@@ -1,9 +1,17 @@
 import Schnorrkel from "@borislav.itskov/schnorrkel.js";
 
-let schnorrkel: Schnorrkel|null;
-export default function getSchnorrkelInstance() {
-  if (!schnorrkel) {
-    schnorrkel = new Schnorrkel();
+let txnSchnorrkel: Schnorrkel|null;
+export function getTxnSchnorrkelSigner() {
+  if (!txnSchnorrkel) {
+    txnSchnorrkel = new Schnorrkel();
   }
-  return schnorrkel;
+  return txnSchnorrkel;
+}
+
+let userOpSchnorrkel: Schnorrkel|null;
+export function getUserOpSchnorrkelSigner() {
+  if (!userOpSchnorrkel) {
+    userOpSchnorrkel = new Schnorrkel();
+  }
+  return userOpSchnorrkel;
 }

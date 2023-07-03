@@ -63,6 +63,7 @@ const CreateMultisigByScanning = (props: any) => {
       const schnorrVirtualAddr =
         "0x" + schnorrHash.slice(schnorrHash.length - 40, schnorrHash.length);
 
+      // TO DO<ERC-4337>: Get the bytecode for the ERC-4337 contract
       const bytecode = getProxyDeployBytecode(
         AMBIRE_ADDRESS,
         [{ addr: schnorrVirtualAddr, hash: true }],

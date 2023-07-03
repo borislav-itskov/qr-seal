@@ -14,7 +14,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import MultisigContext from "../../auth/context/multisig";
-import getSchnorrkelInstance from "../../singletons/Schnorr";
+import { getTxnSchnorrkelSigner } from "../../singletons/Schnorr";
 import { useEOA } from "../../auth/context/eoa";
 import { mainProvider } from "../../config/constants";
 
@@ -65,7 +65,7 @@ const CreateTransaction = (props: any) => {
       Buffer.from(ethers.utils.arrayify(data.multisigPartnerPublicKey))
     );
     const publicKeys = [publicKeyOne, publicKeyTwo];
-    const schnorrkel = getSchnorrkelInstance()
+    const schnorrkel = getTxnSchnorrkelSigner()
     const privateKey = new Key(
       Buffer.from(ethers.utils.arrayify(eoaPrivateKey))
     );
