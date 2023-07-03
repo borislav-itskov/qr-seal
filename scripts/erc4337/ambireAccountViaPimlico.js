@@ -1,8 +1,7 @@
 const { EntryPoint__factory } = require("@account-abstraction/contracts")
 const { StaticJsonRpcProvider } = require("@ethersproject/providers")
 const { ethers } = require("ethers")
-const { getAddress } = require("ethers/lib/utils")
-const { rpcs, chainIds, chains } = require("./config")
+const { rpcs, chainIds, chains, factoryAddr } = require("./config")
 require('dotenv').config();
 const { default: Schnorrkel, Key } = require('@borislav.itskov/schnorrkel.js')
 const ERC4337Account = require('../../artifacts/contracts/ERC4337Account.sol/ERC4337Account.json')
@@ -48,9 +47,9 @@ function getExecuteCalldata(txns, signature) {
 const run = async () => {
   const someWallet = ethers.Wallet.createRandom()
   const pk = someWallet.privateKey
-  const AMBIRE_ACCOUNT_FACTORY_ADDR = "0x153E957A9ff1688BbA982856Acf178524aF96D78"
+  const AMBIRE_ACCOUNT_FACTORY_ADDR = factoryAddr.polygon
   const ENTRY_POINT_ADDRESS = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
-  const provider = new StaticJsonRpcProvider(rpcs.mumbai)
+  const provider = new StaticJsonRpcProvider(rpcs.polygon)
   const entryPoint = EntryPoint__factory.connect(ENTRY_POINT_ADDRESS, provider)
   const owner = new ethers.Wallet(pk, provider)
   const abicoder = new ethers.utils.AbiCoder()
@@ -82,7 +81,7 @@ const run = async () => {
   // send money to the signer txn
   const singleTxn = [to, value, data]
   const txns = [singleTxn]
-  const msg = abicoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [senderAddress, chainIds.mumbai, '0x00', txns])
+  const msg = abicoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [senderAddress, chainIds.polygon, '0x00', txns])
   const hashFn = ethers.utils.keccak256
   const schnorrPrivateKey = new Key(Buffer.from(ethers.utils.arrayify(pk)))
   const schnorrSig = Schnorrkel.sign(schnorrPrivateKey, msg, hashFn)
@@ -129,7 +128,7 @@ const run = async () => {
   // REQUEST PIMLICO VERIFYING PAYMASTER SPONSORSHIP
   const apiKey = process.env.PIMLICO_API_KEY
 
-  const pimlicoEndpoint = `https://api.pimlico.io/v1/${chains.mumbai}/rpc?apikey=${apiKey}`
+  const pimlicoEndpoint = `https://api.pimlico.io/v1/${chains.polygon}/rpc?apikey=${apiKey}`
 
   const pimlicoProvider = new StaticJsonRpcProvider(pimlicoEndpoint)
 

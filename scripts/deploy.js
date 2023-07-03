@@ -2,7 +2,7 @@ const { ethers } = require("ethers")
 const { AmbireAccountFactory, AmbireAccount } = require("../test/config");
 const { rpcs, chainIds } = require("./erc4337/config");
 require('dotenv').config();
-const provider = new ethers.providers.JsonRpcProvider(rpcs.mumbai)
+const provider = new ethers.providers.JsonRpcProvider(rpcs.polygon)
 
 async function generateFactoryDeploy (gasPrice) {
 	const txn = {}
@@ -18,7 +18,7 @@ async function generateFactoryDeploy (gasPrice) {
 	txn.data = txn.data.data
 	txn.gasPrice = gasPrice
 	txn.nonce = await provider.getTransactionCount(fundWallet.address)
-	txn.chainId = chainIds.mumbai
+	txn.chainId = chainIds.polygon
 	return await fundWallet.signTransaction(txn)
 }
 
@@ -36,7 +36,7 @@ async function generateAmbireDeploy (gasPrice) {
 	txn.data = txn.data.data
 	txn.gasPrice = gasPrice
 	txn.nonce = await provider.getTransactionCount(fundWallet.address)
-	txn.chainId = chainIds.mumbai
+	txn.chainId = chainIds.polygon
 	return await fundWallet.signTransaction(txn)
 }
 
