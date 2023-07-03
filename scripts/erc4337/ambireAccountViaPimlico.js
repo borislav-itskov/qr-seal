@@ -69,10 +69,8 @@ const run = async () => {
         AMBIRE_ACCOUNT_FACTORY_ADDR,
         getDeployCalldata(bytecodeWithArgs, salt)
     ]))
-  const contract = new ethers.Contract(senderAddress, ERC4337Account.abi, owner)
-  const nonce = hasCode
-    ? (await contract.nonce()).toHexString()
-    : '0x00'
+  const entryPointNonce = await entryPoint.getNonce(senderAddress, 0)
+  const userOpNonce = entryPointNonce.toHexString()
 
   // GENERATE THE CALLDATA
   const to = "0xCB8B547f2895475838195ee52310BD2422544408" // test metamask addr
@@ -84,7 +82,7 @@ const run = async () => {
   // send money to the signer txn
   const singleTxn = [to, value, data]
   const txns = [singleTxn]
-  const msg = abicoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [senderAddress, chainIds.mumbai, nonce, txns])
+  const msg = abicoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [senderAddress, chainIds.mumbai, '0x00', txns])
   const hashFn = ethers.utils.keccak256
   const schnorrPrivateKey = new Key(Buffer.from(ethers.utils.arrayify(pk)))
   const schnorrSig = Schnorrkel.sign(schnorrPrivateKey, msg, hashFn)
@@ -116,7 +114,7 @@ const run = async () => {
 
   const userOperation = {
     sender: senderAddress,
-    nonce,
+    nonce: userOpNonce,
     initCode,
     callData: executeCalldata,
     callGasLimit: ethers.utils.hexlify(100_000), // hardcode it for now at a high value
