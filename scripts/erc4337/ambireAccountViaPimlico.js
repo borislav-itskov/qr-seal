@@ -1,8 +1,3 @@
-/*
-1. Remove owner rights and sign with schnorr only
-2. We should sign the userOp with schnorr only.
-*/
-
 const { EntryPoint__factory } = require("@account-abstraction/contracts")
 const { StaticJsonRpcProvider } = require("@ethersproject/providers")
 const { ethers } = require("ethers")
@@ -36,23 +31,19 @@ function getDeployCalldata(bytecodeWithArgs, salt2) {
   ])
 }
 
-function getExecuteCalldata(txns, signature) {
-  const abi = ['function execute(tuple(address, uint, bytes)[] calldata txns, bytes calldata signature) public payable']
+function getExecuteCalldata(txns) {
+  const abi = ['function executeBySender(tuple(address, uint, bytes)[] calldata txns) external payable']
   const iface = new ethers.utils.Interface(abi)
-  return iface.encodeFunctionData('execute', [
-    txns,
-    signature
-  ])
+  return iface.encodeFunctionData('executeBySender', [txns])
 }
 
 const run = async () => {
   const someWallet = ethers.Wallet.createRandom()
   const pk = someWallet.privateKey
-  const AMBIRE_ACCOUNT_FACTORY_ADDR = factoryAddr.polygon
+  const AMBIRE_ACCOUNT_FACTORY_ADDR = factoryAddr.mumbai
   const ENTRY_POINT_ADDRESS = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
-  const provider = new StaticJsonRpcProvider(rpcs.polygon)
+  const provider = new StaticJsonRpcProvider(rpcs.mumbai)
   const entryPoint = EntryPoint__factory.connect(ENTRY_POINT_ADDRESS, provider)
-  const owner = new ethers.Wallet(pk, provider)
   const abicoder = new ethers.utils.AbiCoder()
   const schnorrVirtualAddr = getSchnorrAddress(pk)
   const bytecodeWithArgs = ethers.utils.concat([
@@ -76,38 +67,9 @@ const run = async () => {
   const to = "0xCB8B547f2895475838195ee52310BD2422544408" // test metamask addr
   const value = 0
   const data = "0x68656c6c6f" // "hello" encoded to to utf-8 bytes
-
-  // create an execute calldata to ambire
-  // we will need to sign it as well...
-  // send money to the signer txn
   const singleTxn = [to, value, data]
   const txns = [singleTxn]
-  const msg = abicoder.encode(['address', 'uint', 'uint', 'tuple(address, uint, bytes)[]'], [senderAddress, chainIds.polygon, '0x00', txns])
-  const hashFn = ethers.utils.keccak256
-  const schnorrPrivateKey = new Key(Buffer.from(ethers.utils.arrayify(pk)))
-  const schnorrSig = Schnorrkel.sign(schnorrPrivateKey, msg, hashFn)
-  const publicKey = ethers.utils.arrayify(ethers.utils.computePublicKey(ethers.utils.arrayify(pk), true))
-  const schnorrPublicKey = new Key(Buffer.from(ethers.utils.arrayify(publicKey)))
-  const verification = Schnorrkel.verify(
-    schnorrSig.signature,
-    msg,
-    schnorrSig.finalPublicNonce,
-    schnorrPublicKey,
-    hashFn
-  )
-  console.log(verification)
-
-  // wrap the schnorr signature and validate that it is valid
-  const px = ethers.utils.hexlify(schnorrPublicKey.buffer.slice(1, 33))
-  const parity = schnorrPublicKey.buffer[0] - 2 + 27
-  const sigData = abicoder.encode([ 'bytes32', 'bytes32', 'bytes32', 'uint8' ], [
-    px,
-    schnorrSig.challenge.buffer,
-    schnorrSig.signature.buffer,
-    parity
-  ])
-  const ambireSig = wrapSchnorr(sigData)
-  const executeCalldata = getExecuteCalldata(txns, ambireSig)
+  const executeCalldata = getExecuteCalldata(txns)
 
   // // FILL OUT THE REMAINING USEROPERATION VALUES
   const gasPrice = await provider.getGasPrice()
@@ -128,7 +90,7 @@ const run = async () => {
 
   // REQUEST PIMLICO VERIFYING PAYMASTER SPONSORSHIP
   const apiKey = process.env.PIMLICO_API_KEY
-  const pimlicoEndpoint = `https://api.pimlico.io/v1/${chains.polygon}/rpc?apikey=${apiKey}`
+  const pimlicoEndpoint = `https://api.pimlico.io/v1/${chains.mumbai}/rpc?apikey=${apiKey}`
   const pimlicoProvider = new StaticJsonRpcProvider(pimlicoEndpoint)
   const sponsorUserOperationResult = await pimlicoProvider.send("pm_sponsorUserOperation", [
     userOperation,
@@ -140,9 +102,11 @@ const run = async () => {
   userOperation.paymasterAndData = paymasterAndData
 
   // SIGN THE USEROPERATION
-  // const signature = await owner.signMessage(ethers.utils.arrayify(await entryPoint.getUserOpHash(userOperation)))
+  const schnorrPrivateKey = new Key(Buffer.from(ethers.utils.arrayify(pk)))
   const userOpHash = await entryPoint.getUserOpHash(userOperation)
   const signature = Schnorrkel.signHash(schnorrPrivateKey, userOpHash)
+  const publicKey = ethers.utils.arrayify(ethers.utils.computePublicKey(ethers.utils.arrayify(pk), true))
+  const schnorrPublicKey = new Key(Buffer.from(ethers.utils.arrayify(publicKey)))
   const verificationUserOp = Schnorrkel.verifyHash(
     signature.signature,
     userOpHash,
@@ -150,6 +114,8 @@ const run = async () => {
     schnorrPublicKey
   )
   console.log(verificationUserOp)
+  const px = ethers.utils.hexlify(schnorrPublicKey.buffer.slice(1, 33))
+  const parity = schnorrPublicKey.buffer[0] - 2 + 27
   const sigDataUserOp = abicoder.encode([ 'bytes32', 'bytes32', 'bytes32', 'uint8' ], [
     px,
     signature.challenge.buffer,

@@ -16,6 +16,7 @@ contract ERC4337Account is AmbireAccount, IAccount {
 
 	constructor(address _entryPoint, address[] memory addrs) {
 		entryPoint = _entryPoint;
+		privileges[_entryPoint] = bytes32(uint(1));
 
         uint len = addrs.length;
 		for (uint i=0; i<len; i++) {

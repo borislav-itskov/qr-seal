@@ -1,4 +1,4 @@
-import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
+import { Key } from "@borislav.itskov/schnorrkel.js";
 import {
   Button,
   Modal,
@@ -9,7 +9,7 @@ import {
 import { utils } from "ethers";
 import { useMemo } from "react";
 import QRCode from "react-qr-code";
-import { getTxnSchnorrkelSigner, getUserOpSchnorrkelSigner } from "../../singletons/Schnorr";
+import { getSchnorrkelInstance } from "../../singletons/Schnorr";
 import { useEOA } from "../../auth/context/eoa";
 
 const JoinMultisig = (props: any) => {
@@ -17,23 +17,17 @@ const JoinMultisig = (props: any) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const qrCodeValue = useMemo(() => {
-    const txnSchnorrkel = getTxnSchnorrkelSigner();
-    const userOpSchnorrkel = getUserOpSchnorrkelSigner();
+    const schnorrkel = getSchnorrkelInstance();
 
     const privateKey = new Key(Buffer.from(utils.arrayify(eoaPrivateKey)))
-    const txnPublicNonces = txnSchnorrkel.hasNonces(privateKey)
-      ? txnSchnorrkel.getPublicNonces(privateKey)
-      : txnSchnorrkel.generatePublicNonces(privateKey);
-    const userOpPublicNonces = userOpSchnorrkel.hasNonces(privateKey)
-      ? userOpSchnorrkel.getPublicNonces(privateKey)
-      : userOpSchnorrkel.generatePublicNonces(privateKey);
+    const publicNonces = schnorrkel.hasNonces(privateKey)
+      ? schnorrkel.getPublicNonces(privateKey)
+      : schnorrkel.generatePublicNonces(privateKey);
 
-    const txnPublicHex = txnPublicNonces.kPublic.toHex();
-    const txnTwoPublicHex = txnPublicNonces.kTwoPublic.toHex();
-    const userOpPublicHex = userOpPublicNonces.kPublic.toHex();
-    const userOpTwoPublicHex = userOpPublicNonces.kTwoPublic.toHex();
+    const kOne = publicNonces.kPublic.toHex();
+    const kTwo = publicNonces.kTwoPublic.toHex();
 
-    return eoaPublicKey + "|" + txnPublicHex + "|" + txnTwoPublicHex + "|" + userOpPublicHex + "|" + userOpTwoPublicHex;
+    return eoaPublicKey + "|" + kOne + "|" + kTwo
   }, [eoaPrivateKey, eoaPublicKey]);
 
   return (
