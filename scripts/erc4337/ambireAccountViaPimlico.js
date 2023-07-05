@@ -12,10 +12,6 @@ const { default: Schnorrkel, Key } = require('@borislav.itskov/schnorrkel.js')
 const ERC4337Account = require('../../artifacts/contracts/ERC4337Account.sol/ERC4337Account.json')
 const salt = '0x0'
 
-function wrapEthSign(sig) {
-  return `${sig}${'01'}`
-}
-
 function wrapSchnorr(sig) {
   return `${sig}${'04'}`
 }
@@ -61,7 +57,7 @@ const run = async () => {
   const schnorrVirtualAddr = getSchnorrAddress(pk)
   const bytecodeWithArgs = ethers.utils.concat([
     ERC4337Account.bytecode,
-    abicoder.encode(['address', 'address[]'], [ENTRY_POINT_ADDRESS, [owner.address, schnorrVirtualAddr]])
+    abicoder.encode(['address', 'address[]'], [ENTRY_POINT_ADDRESS, [schnorrVirtualAddr]])
   ])
 
   const senderAddress = getAmbireAccountAddress(AMBIRE_ACCOUNT_FACTORY_ADDR, bytecodeWithArgs)
@@ -132,26 +128,35 @@ const run = async () => {
 
   // REQUEST PIMLICO VERIFYING PAYMASTER SPONSORSHIP
   const apiKey = process.env.PIMLICO_API_KEY
-
   const pimlicoEndpoint = `https://api.pimlico.io/v1/${chains.polygon}/rpc?apikey=${apiKey}`
-
   const pimlicoProvider = new StaticJsonRpcProvider(pimlicoEndpoint)
-
   const sponsorUserOperationResult = await pimlicoProvider.send("pm_sponsorUserOperation", [
     userOperation,
     {
       entryPoint: ENTRY_POINT_ADDRESS
     }
   ])
-
   const paymasterAndData = sponsorUserOperationResult.paymasterAndData
-
   userOperation.paymasterAndData = paymasterAndData
 
   // SIGN THE USEROPERATION
-  const signature = await owner.signMessage(ethers.utils.arrayify(await entryPoint.getUserOpHash(userOperation)))
-  const wrappedSig = wrapEthSign(signature)
-
+  // const signature = await owner.signMessage(ethers.utils.arrayify(await entryPoint.getUserOpHash(userOperation)))
+  const userOpHash = await entryPoint.getUserOpHash(userOperation)
+  const signature = Schnorrkel.signHash(schnorrPrivateKey, userOpHash)
+  const verificationUserOp = Schnorrkel.verifyHash(
+    signature.signature,
+    userOpHash,
+    signature.finalPublicNonce,
+    schnorrPublicKey
+  )
+  console.log(verificationUserOp)
+  const sigDataUserOp = abicoder.encode([ 'bytes32', 'bytes32', 'bytes32', 'uint8' ], [
+    px,
+    signature.challenge.buffer,
+    signature.signature.buffer,
+    parity
+  ])
+  const wrappedSig = wrapSchnorr(sigDataUserOp)
   userOperation.signature = wrappedSig
 
   // SUBMIT THE USEROPERATION TO BE BUNDLED
