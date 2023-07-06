@@ -2,6 +2,7 @@
 pragma solidity ^0.8.12;
 import 'hardhat/console.sol';
 import './SenderCreator.sol';
+import './libs/Exec.sol';
 
 /**
  * helper contract for EntryPoint, to call userOp.initCode from a "neutral" address,
@@ -21,5 +22,14 @@ contract EntryPoint {
             if (sender1 != sender) revert FailedOp(0, "AA14 initCode must return sender");
             if (sender1.code.length == 0) revert FailedOp(0, "AA15 initCode must create sender");
         }
+    }
+
+    function sendTxnOutside(address sender, bytes calldata callData, uint256 callGasLimit) public {
+        this.sendTxn(sender, callData, callGasLimit);
+    }
+
+
+    function sendTxn(address sender, bytes calldata callData, uint256 callGasLimit) external {
+        Exec.call(sender, 0, callData, callGasLimit);
     }
 }

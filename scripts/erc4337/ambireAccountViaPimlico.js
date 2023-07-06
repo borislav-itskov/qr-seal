@@ -5,6 +5,7 @@ const { rpcs, chainIds, chains, factoryAddr } = require("./config")
 require('dotenv').config();
 const { default: Schnorrkel, Key } = require('@borislav.itskov/schnorrkel.js')
 const ERC4337Account = require('../../artifacts/contracts/ERC4337Account.sol/ERC4337Account.json')
+const AmbireAccount = require('../../artifacts/contracts/AmbireAccount.sol/AmbireAccount.json')
 const salt = '0x0'
 
 function wrapSchnorr(sig) {
@@ -124,6 +125,29 @@ const run = async () => {
   ])
   const wrappedSig = wrapSchnorr(sigDataUserOp)
   userOperation.signature = wrappedSig
+
+  // const abi = ['function simulateHandleOp(tuple(address, uint256, bytes, bytes, uint256, uint256, uint256, uint256, uint256, bytes, bytes) calldata op, address target, bytes calldata targetCallData)']
+  // const iface = new ethers.utils.Interface(abi)
+  // const simulateData = iface.encodeFunctionData('simulateHandleOp', [
+  //   Object.values(userOperation),
+  //   senderAddress,
+  //   executeCalldata
+  // ])
+  // const validation = await provider.call({
+  //   to: ENTRY_POINT_ADDRESS,
+  //   data: simulateData
+  // })
+  // const decodeAbi = ['error ExecutionResult(uint256, uint256, uint48, uint48, bool, bytes)']
+  // const iface2 = new ethers.utils.Interface(decodeAbi)
+  // const selector = validation.slice(0, 10);
+  // const decoded = iface2.decodeErrorResult(selector, validation)
+  // console.log(decoded)
+
+  // const ambireWallet = new ethers.Contract(senderAddress, AmbireAccount.abi)
+  // const iface3 = ambireWallet.interface;
+  // const selector2 = decoded[5].slice(0, 10);
+  // const error = iface3.decodeErrorResult(selector2, decoded[5])
+  // console.log(error)
 
   // SUBMIT THE USEROPERATION TO BE BUNDLED
   const userOperationHash = await pimlicoProvider.send("eth_sendUserOperation", [userOperation, ENTRY_POINT_ADDRESS])
