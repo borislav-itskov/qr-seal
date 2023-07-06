@@ -16,7 +16,10 @@ import {
 import MultisigContext from "../../auth/context/multisig";
 import { getSchnorrkelInstance } from "../../singletons/Schnorr";
 import { useEOA } from "../../auth/context/eoa";
-import { mainProvider } from "../../config/constants";
+import { ENTRY_POINT_ADDRESS, FACTORY_ADDRESS, mainProvider } from "../../config/constants";
+import { EntryPoint__factory } from "@account-abstraction/contracts"
+import ERC4337Account from '../../builds/ERC4337Account.json'
+import { computeSchnorrAddress, getDeployCalldata, getExecuteCalldata } from "../../utils/helpers";
 
 interface FormProps {
   to: string;
@@ -43,8 +46,7 @@ const CreateTransaction = (props: any) => {
   const onSubmit = async (values: FormProps) => {
     const data = getAllMultisigData();
     if (!data) return
-    
-    const { chainId } = await mainProvider.getNetwork()
+
     const abiCoder = new ethers.utils.AbiCoder();
     const sendTosignerTxn = [
       values.to,
@@ -54,10 +56,6 @@ const CreateTransaction = (props: any) => {
     const txns = [sendTosignerTxn];
     // TO DO: the nonce is hardcoded to 0 here.
     // change it to read from the contract if any
-    const msg = abiCoder.encode(
-      ["address", "uint", "uint", "tuple(address, uint, bytes)[]"],
-      [data.multisigAddr, chainId, 0, txns]
-    );
     const publicKeyOne = new Key(
       Buffer.from(ethers.utils.arrayify(eoaPublicKey))
     );
@@ -73,23 +71,64 @@ const CreateTransaction = (props: any) => {
       kPublic: Key.fromHex(data.multisigPartnerKPublicHex),
       kTwoPublic: Key.fromHex(data.multisigPartnerKTwoPublicHex),
     };
-    console.log(partnerNonces.kPublic.toHex())
-    console.log(partnerNonces.kTwoPublic.toHex())
 
     const publicNonces = schnorrkel.generatePublicNonces(privateKey);
     const combinedPublicNonces = [publicNonces, partnerNonces];
-    const hashFn = ethers.utils.keccak256;
-    const { signature } = schnorrkel.multiSigSign(
+
+    // configure the user operation
+    const combinedPublicKey = Schnorrkel.getCombinedPublicKey(publicKeys);
+    const schnorrVirtualAddr = computeSchnorrAddress(combinedPublicKey)
+    const entryPoint = EntryPoint__factory.connect(ENTRY_POINT_ADDRESS, mainProvider)
+    const entryPointNonce = await entryPoint.getNonce(data.multisigAddr, 0)
+    const userOpNonce = entryPointNonce.toHexString()
+    const bytecodeWithArgs = ethers.utils.concat([
+      ERC4337Account.bytecode,
+      abiCoder.encode(['address', 'address[]'], [ENTRY_POINT_ADDRESS, [schnorrVirtualAddr]])
+    ])
+    const initCode = ethers.utils.hexlify(ethers.utils.concat([
+        FACTORY_ADDRESS,
+        getDeployCalldata(bytecodeWithArgs)
+    ]))
+    const executeCalldata = getExecuteCalldata([txns])
+    const gasPrice = await mainProvider.getGasPrice()
+    const hexGasPrice = ethers.utils.hexlify(gasPrice)
+    const userOperation = {
+      sender: data.multisigAddr,
+      nonce: userOpNonce,
+      initCode,
+      callData: executeCalldata,
+      callGasLimit: ethers.utils.hexlify(100_000), // hardcode it for now at a high value
+      verificationGasLimit: ethers.utils.hexlify(2_000_000), // hardcode it for now at a high value
+      preVerificationGas: ethers.utils.hexlify(50_000), // hardcode it for now at a high value
+      maxFeePerGas: hexGasPrice,
+      maxPriorityFeePerGas: hexGasPrice,
+      paymasterAndData: "0x",
+      signature: "0x"
+    }
+
+    // REQUEST PIMLICO VERIFYING PAYMASTER SPONSORSHIP
+    const apiKey = process.env.REACT_APP_PIMLICO_API_KEY
+    const pimlicoEndpoint = `https://api.pimlico.io/v1/polygon/rpc?apikey=${apiKey}`
+    const pimlicoProvider = new ethers.providers.StaticJsonRpcProvider(pimlicoEndpoint)
+    const sponsorUserOperationResult = await pimlicoProvider.send("pm_sponsorUserOperation", [
+      userOperation,
+      {
+        entryPoint: ENTRY_POINT_ADDRESS
+      }
+    ])
+    const paymasterAndData = sponsorUserOperationResult.paymasterAndData
+    userOperation.paymasterAndData = paymasterAndData
+
+    const userOpHash = await entryPoint.getUserOpHash(userOperation)
+    const { signature } = schnorrkel.multiSigSignHash(
       privateKey,
-      msg,
+      userOpHash,
       publicKeys,
-      combinedPublicNonces,
-      hashFn
+      combinedPublicNonces
     );
     const sigHex = signature.toHex()
     const kPublicHex = publicNonces.kPublic.toHex();
     const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
-    // const qrCode = eoaPublicKey + "|" + kPublicHex + "|" + kTwoPublicHex + "|" + sigHex + "|" + values.to + "|" + values.value.toString()
     const qrCode =
       eoaPublicKey +
       "|" +
@@ -101,15 +140,13 @@ const CreateTransaction = (props: any) => {
       "|" +
       values.to +
       "|" +
-      values.value
+      values.value +
+      "|" +
+      hexGasPrice +
+      "|" +
+      paymasterAndData
     setQrCodeValue(qrCode);
     onQrOpen();
-    // console.log(eoaPublicKey)
-    // console.log(kPublicHex)
-    // console.log(kTwoPublicHex)
-    // console.log(sigHex)
-    // console.log(values.to)
-    // console.log(values.value)
     return new Promise((resolve) => resolve(true));
   };
 
