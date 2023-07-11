@@ -6,7 +6,6 @@ import "./libs/SignatureValidator.sol";
 import "../node_modules/@account-abstraction/contracts/interfaces/IAccount.sol";
 import "../node_modules/@account-abstraction/contracts/interfaces/UserOperation.sol";
 
-
 contract ERC4337Account is AmbireAccount, IAccount {
 	address public immutable entryPoint;
 
@@ -39,15 +38,6 @@ contract ERC4337Account is AmbireAccount, IAccount {
 		if (privileges[signer] == bytes32(0)) {
 			validationData = SIG_VALIDATION_FAILED;
 		}
-
-		// NOTE<Bobby>: the below validation is impossible as Ambire's nonce
-		// does not increase in some cases:
-		// - recovery
-		// - recovery cancel
-		// the below code will brick the contract after any of the above txns is executed
-		// if (userOp.initCode.length == 0) {
-		// 	require(nonce == userOp.nonce, "account: invalid nonce");
-		// }
 
 		if (missingAccountFunds > 0) {
 			(bool success,) = payable(msg.sender).call{value : missingAccountFunds}("");
