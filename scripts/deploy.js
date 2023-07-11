@@ -1,12 +1,12 @@
 const { ethers } = require("ethers")
-const { AmbireAccountFactory, AmbireAccount } = require("../test/config")
+const { AmbireAccountFactory, AmbireAccount } = require("../test/config");
+const { rpcs, chainIds } = require("./erc4337/config");
+require('dotenv').config();
+const provider = new ethers.providers.JsonRpcProvider(rpcs.polygon)
 
-const polygon = 'https://polygon-rpc.com'
-const provider = new ethers.providers.JsonRpcProvider(polygon)
-
-async function generateFactoryDeploy (gasPrice) {4
+async function generateFactoryDeploy (gasPrice) {
 	const txn = {}
-  	const hardhatPk = ''
+  	const hardhatPk = process.env.DEPLOY_PRIVATE_KEY
 	const fundWallet = new ethers.Wallet(hardhatPk, provider)
 	const factory = new ethers.ContractFactory(AmbireAccountFactory.abi, AmbireAccountFactory.bytecode, fundWallet)
 
@@ -18,13 +18,13 @@ async function generateFactoryDeploy (gasPrice) {4
 	txn.data = txn.data.data
 	txn.gasPrice = gasPrice
 	txn.nonce = await provider.getTransactionCount(fundWallet.address)
-	txn.chainId = 137
+	txn.chainId = chainIds.polygon
 	return await fundWallet.signTransaction(txn)
 }
 
 async function generateAmbireDeploy (gasPrice) {
 	const txn = {}
-  	const hardhatPk = ''
+	const hardhatPk = process.env.DEPLOY_PRIVATE_KEY
 	const fundWallet = new ethers.Wallet(hardhatPk, provider)
 	const factory = new ethers.ContractFactory(AmbireAccount.abi, AmbireAccount.bytecode, fundWallet)
 
@@ -36,14 +36,14 @@ async function generateAmbireDeploy (gasPrice) {
 	txn.data = txn.data.data
 	txn.gasPrice = gasPrice
 	txn.nonce = await provider.getTransactionCount(fundWallet.address)
-	txn.chainId = 137
+	txn.chainId = chainIds.polygon
 	return await fundWallet.signTransaction(txn)
 }
 
 async function deploy() {
 
   const feeData = await provider.getFeeData()
-  const sig = await generateAmbireDeploy(feeData.gasPrice)
+  const sig = await generateFactoryDeploy(feeData.gasPrice)
   console.log(sig)
 
   // const contractFactoryAmbire = new ethers.ContractFactory(AmbireAccount.abi, AmbireAccount.bytecode, fundWallet)

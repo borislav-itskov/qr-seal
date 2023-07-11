@@ -17,27 +17,24 @@ import {
     Flex,
   } from "@chakra-ui/react";
 import QRCodeScanner from "../../common/QRCodeScanner";
-import { useState, createContext, useContext } from "react";
+import { useState, useContext } from "react";
 import Schnorrkel, { Key, Signature } from "@borislav.itskov/schnorrkel.js";
-import { getAmbireAccountAddress, wrapSchnorr } from "../../utils/helpers";
-import buildinfo from "../../builds/FactoryAndAccountBuild.json";
-import {
-  getProxyDeployBytecode,
-  getStorageSlotsFromArtifact,
-} from "../../deploy/getBytecode";
+import { computeSchnorrAddress, getDeployCalldata, getExecuteCalldata, getMultisigAddress, wrapSchnorr } from "../../utils/helpers";
 import { ethers } from "ethers";
 import MultisigContext from "../../auth/context/multisig";
 
-import { AMBIRE_ADDRESS, FACTORY_ADDRESS, mainProvider, deployGasLimit } from "../../config/constants";
+import { FACTORY_ADDRESS, mainProvider, ENTRY_POINT_ADDRESS } from "../../config/constants";
 import { useForm } from "react-hook-form";
-import getSchnorrkelInstance from "../../singletons/Schnorr";
-import AmbireAccountFactory from '../../builds/AmbireAccountFactory.json'
+import { getSchnorrkelInstance } from "../../singletons/Schnorr";
 import { useEOA } from "../../auth/context/eoa";
 import { useSteps } from "../../auth/context/step";
+import { EntryPoint__factory } from "@account-abstraction/contracts";
+import ERC4337Account from '../../builds/ERC4337Account.json'
 
 interface FormProps {
   to: string;
   value: number;
+  gasPrice: string;
 }
 
 const CoSign = (props: any) => {
@@ -47,7 +44,8 @@ const CoSign = (props: any) => {
   const { createAndStoreMultisigDataIfNeeded, getAllMultisigData } = useContext(MultisigContext)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isFormOpen, onOpen: onFormOpen, onClose: onFormClose } = useDisclosure();
-  const [transaction, setTransaction] = useState<any>(null)
+  const [transactionHash, setTransactionHash] = useState<any>(null)
+  const [paymasterAndData, setPaymasterAndData] = useState<any>(null)
 
   const {
     handleSubmit,
@@ -59,7 +57,7 @@ const CoSign = (props: any) => {
     const data = scan.split("|");
 
     // TODO: Validate better if data is multisig!
-    if (data.length !== 6) {
+    if (data.length !== 8) {
       alert("Missing all multisig data in the QR code you scanned!");
 
       return;
@@ -72,15 +70,8 @@ const CoSign = (props: any) => {
     const multisigPartnerSignature = data[3];
     const formTo = data[4];
     const formValue = data[5];
-
-    // HARDCODE VALUES THAT WE WILL REMOVE LATER
-    // const publicKey = eoaPublicKey;
-    // const multisigPartnerPublicKey = '0x02afc56ffa2958ca5614f22a012f17e2df1a332304677ecc429e2f867f6e7db7bf';
-    // const multisigPartnerKPublicHex = '033dd7be8995d101f29cd12bd773e5549bd0ef507f922251197177f9aedaf2d2b6';
-    // const multisigPartnerKTwoPublicHex = '03761d7910d20615400cda0d1cac80880145fcb94bc1e0699549c72db68a170df3';
-    // const multisigPartnerSignature = '439d20128e356b51e567abfaefa29ebf351a4831bf3e621230a51c1af3517413';
-    // const formTo = '0xCD4D4a1955852c6dC2b8fd7E3FEB7724373DB9Cc'
-    // const formValue = '2'
+    const gasPrice = data[6];
+    const pimlicoPaymaster = data[7];
 
     const publicKeyOne = new Key(Buffer.from(ethers.utils.arrayify(publicKey)));
     const publicKeyTwo = new Key(
@@ -90,21 +81,7 @@ const CoSign = (props: any) => {
       publicKeyOne,
       publicKeyTwo,
     ]);
-    const px = ethers.utils.hexlify(combinedPublicKey.buffer.slice(1, 33));
-    const schnorrHash = ethers.utils.keccak256(
-      ethers.utils.solidityPack(["string", "bytes"], ["SCHNORR", px])
-    );
-    const schnorrVirtualAddr =
-      "0x" + schnorrHash.slice(schnorrHash.length - 40, schnorrHash.length);
-
-    const bytecode = getProxyDeployBytecode(
-      AMBIRE_ADDRESS,
-      [{ addr: schnorrVirtualAddr, hash: true }],
-      {
-        ...getStorageSlotsFromArtifact(buildinfo),
-      }
-    );
-    const multisigAddr = getAmbireAccountAddress(FACTORY_ADDRESS, bytecode);
+    const multisigAddr = getMultisigAddress([publicKeyOne, publicKeyTwo])
 
     // Set data in local storage
     createAndStoreMultisigDataIfNeeded({
@@ -113,13 +90,14 @@ const CoSign = (props: any) => {
       "multisigPartnerKTwoPublicHex": multisigPartnerKTwoPublicHex,
       "multisigAddr": multisigAddr,
       "multisigPartnerSignature": multisigPartnerSignature,
-      "combinedPublicKey": combinedPublicKey,
-      "bytecode": bytecode
+      "combinedPublicKey": combinedPublicKey
     })
 
     onClose();
     setValue('to', formTo);
     setValue('value', +formValue);
+    setValue('gasPrice', gasPrice);
+    setPaymasterAndData(pimlicoPaymaster)
     onFormOpen();
   };
   const handleScanError = (error: any) => console.error(error);
@@ -129,7 +107,6 @@ const CoSign = (props: any) => {
     const data = getAllMultisigData();
     if (!data) return
 
-    const { chainId } = await mainProvider.getNetwork()
     const abiCoder = new ethers.utils.AbiCoder();
     const sendTosignerTxn = [
       values.to,
@@ -137,12 +114,6 @@ const CoSign = (props: any) => {
       "0x00",
     ];
     const txns = [sendTosignerTxn];
-    // TO DO: the nonce is hardcoded to 0 here.
-    // change it to read from the contract if any
-    const msg = abiCoder.encode(
-      ["address", "uint", "uint", "tuple(address, uint, bytes)[]"],
-      [data.multisigAddr, chainId, 0, txns]
-    );
     const publicKeyOne = new Key(
       Buffer.from(ethers.utils.arrayify(eoaPublicKey))
     );
@@ -160,41 +131,80 @@ const CoSign = (props: any) => {
     const schnorrkel = getSchnorrkelInstance()
     const publicNonces = schnorrkel.getPublicNonces(privateKey)
     const combinedPublicNonces = [publicNonces, partnerNonces];
-    const hashFn = ethers.utils.keccak256;
-    const { signature, challenge, finalPublicNonce } = schnorrkel.multiSigSign(
+
+    const entryPoint = EntryPoint__factory.connect(ENTRY_POINT_ADDRESS, mainProvider)
+    const entryPointNonce = await entryPoint.getNonce(data.multisigAddr, 0)
+    const schnorrVirtualAddr = computeSchnorrAddress(data.combinedPublicKey)
+    const userOpNonce = entryPointNonce.toHexString()
+    const bytecodeWithArgs = ethers.utils.concat([
+      ERC4337Account.bytecode,
+      abiCoder.encode(['address', 'address[]'], [ENTRY_POINT_ADDRESS, [schnorrVirtualAddr]])
+    ])
+    const initCode = ethers.utils.hexlify(ethers.utils.concat([
+        FACTORY_ADDRESS,
+        getDeployCalldata(bytecodeWithArgs)
+    ]))
+    const executeCalldata = getExecuteCalldata([txns])
+    const userOperation = {
+      sender: data.multisigAddr,
+      nonce: userOpNonce,
+      initCode,
+      callData: executeCalldata,
+      callGasLimit: ethers.utils.hexlify(100_000), // hardcode it for now at a high value
+      verificationGasLimit: ethers.utils.hexlify(2_000_000), // hardcode it for now at a high value
+      preVerificationGas: ethers.utils.hexlify(50_000), // hardcode it for now at a high value
+      maxFeePerGas: values.gasPrice,
+      maxPriorityFeePerGas: values.gasPrice,
+      paymasterAndData: paymasterAndData,
+      signature: "0x"
+    }
+    const userOpHash = await entryPoint.getUserOpHash(userOperation)
+    const { signature, challenge, finalPublicNonce } = schnorrkel.multiSigSignHash(
       privateKey,
-      msg,
+      userOpHash,
       publicKeys,
-      combinedPublicNonces,
-      hashFn
+      combinedPublicNonces
     );
     const partnerSig = Signature.fromHex(data.multisigPartnerSignature)
     const summedSig = Schnorrkel.sumSigs([signature, partnerSig])
-    const verification = Schnorrkel.verify(summedSig, msg, finalPublicNonce, data.combinedPublicKey, hashFn)
+    const verification = Schnorrkel.verifyHash(summedSig, userOpHash, finalPublicNonce, data.combinedPublicKey)
     console.log('VERIFICATION: ' + verification)
 
-    const px = ethers.utils.hexlify(data.combinedPublicKey.buffer.slice(1, 33));
+    // set the user op signature
+    const px = ethers.utils.hexlify(data.combinedPublicKey.buffer.slice(1, 33))
     const parity = data.combinedPublicKey.buffer[0] - 2 + 27
-    
-    const sigData = abiCoder.encode([ 'bytes32', 'bytes32', 'bytes32', 'uint8' ], [
+    const sigDataUserOp = abiCoder.encode([ 'bytes32', 'bytes32', 'bytes32', 'uint8' ], [
       px,
       challenge.buffer,
       summedSig.buffer,
       parity
     ])
-    const ambireSig = wrapSchnorr(sigData)
+    const wrappedSig = wrapSchnorr(sigDataUserOp)
+    userOperation.signature = wrappedSig
 
-    const wallet = new ethers.Wallet(
-      ethers.utils.arrayify(eoaPrivateKey),
-      mainProvider
-    )
-    const factory = new ethers.Contract(FACTORY_ADDRESS, AmbireAccountFactory.abi, wallet)
-    const feeData = await mainProvider.getFeeData()
-    const transactionHash = await factory.deployAndExecute(data.bytecode, 0, txns, ambireSig, {
-      gasPrice: feeData.gasPrice?.toString(),
-      gasLimit: ethers.BigNumber.from(ethers.utils.hexlify(250000))
-    })
-    console.log(transactionHash)
+    // send the transaction
+    const apiKey = process.env.REACT_APP_PIMLICO_API_KEY
+    const pimlicoEndpoint = `https://api.pimlico.io/v1/polygon/rpc?apikey=${apiKey}`
+    const pimlicoProvider = new ethers.providers.StaticJsonRpcProvider(pimlicoEndpoint)
+    const userOperationHash = await pimlicoProvider.send("eth_sendUserOperation", [userOperation, ENTRY_POINT_ADDRESS])
+
+    // let's also wait for the userOperation to be included, by continually querying for the receipts
+    console.log("Querying for receipts...")
+    let receipt = null
+    let counter = 0
+    while (receipt === null) {
+      try {
+        await new Promise((r) => setTimeout(r, 1000)) //sleep
+        counter++
+        receipt = await pimlicoProvider.send("eth_getUserOperationReceipt", [userOperationHash])
+        console.log(receipt)
+      } catch (e) {
+        console.log('error throwed, retry counter ' + counter)
+      }
+    }
+
+    const txHash = receipt.receipt.transactionHash
+    console.log(`${txHash}`)
 
     onFormClose()
     toast({
@@ -206,13 +216,13 @@ const CoSign = (props: any) => {
     })
     setActiveStep(3)
 
-    setTransaction(transactionHash)
+    setTransactionHash(txHash)
   }
 
   const openInExplorer = () => {
-    if (!transaction) return;
+    if (!transactionHash) return;
 
-    const polygonScanUrl = `https://polygonscan.com/tx/${transaction?.hash}`;
+    const polygonScanUrl = `https://polygonscan.com/tx/${transactionHash}`;
     window.open(polygonScanUrl, '_blank');
   }
 
@@ -220,13 +230,13 @@ const CoSign = (props: any) => {
     <>
       <Flex flex={"1"} height="100%" flexDirection={"column"}>
       <Button onClick={onOpen} flex={1} my={4} _hover={{ bg: 'transparent', color: "teal.400", borderColor: "teal.400" }} background={"teal.400"} py={2} borderWidth={3} borderColor={"teal.400"} color={"white"}>Co-Sign</Button>
-      {transaction && (
+      {transactionHash && (
         <Alert status="success" mt={4} mb={8} colorScheme="teal">
           <AlertIcon />
           <Box flex="1">
             <AlertTitle color="teal.900">Transaction Sent! Hash:</AlertTitle>
             <AlertDescription display="flex" alignItems="center" flexDirection="column">
-              <Text mr={2} color="teal.900" wordBreak="break-word">{transaction.hash}</Text>
+              <Text mr={2} color="teal.900" wordBreak="break-word">{transactionHash}</Text>
               <Button size="sm" onClick={openInExplorer}>
                 View on PolygonScan
               </Button>
@@ -274,6 +284,9 @@ const CoSign = (props: any) => {
                   valueAsNumber: true,
                 })}
               />
+            </FormControl>
+            <FormControl>
+              <Input id="gasPrice" type="hidden" />
             </FormControl>
             <Button
               mt={4}

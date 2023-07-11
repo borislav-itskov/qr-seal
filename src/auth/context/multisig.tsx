@@ -10,7 +10,6 @@ export interface MultisigData {
   multisigAddr: string;
   multisigPartnerSignature?: string;
   combinedPublicKey?: Key;
-  bytecode?: string;
 }
 
 export const getMultisigData = () =>

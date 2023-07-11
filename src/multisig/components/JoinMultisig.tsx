@@ -1,4 +1,4 @@
-import Schnorrkel, { Key } from "@borislav.itskov/schnorrkel.js";
+import { Key } from "@borislav.itskov/schnorrkel.js";
 import {
   Button,
   Modal,
@@ -9,7 +9,7 @@ import {
 import { utils } from "ethers";
 import { useMemo } from "react";
 import QRCode from "react-qr-code";
-import getSchnorrkelInstance from "../../singletons/Schnorr";
+import { getSchnorrkelInstance } from "../../singletons/Schnorr";
 import { useEOA } from "../../auth/context/eoa";
 
 const JoinMultisig = (props: any) => {
@@ -24,10 +24,10 @@ const JoinMultisig = (props: any) => {
       ? schnorrkel.getPublicNonces(privateKey)
       : schnorrkel.generatePublicNonces(privateKey);
 
-    const kPublicHex = publicNonces.kPublic.toHex();
-    const kTwoPublicHex = publicNonces.kTwoPublic.toHex();
+    const kOne = publicNonces.kPublic.toHex();
+    const kTwo = publicNonces.kTwoPublic.toHex();
 
-    return eoaPublicKey + "|" + kPublicHex + "|" + kTwoPublicHex;
+    return eoaPublicKey + "|" + kOne + "|" + kTwo
   }, [eoaPrivateKey, eoaPublicKey]);
 
   return (
